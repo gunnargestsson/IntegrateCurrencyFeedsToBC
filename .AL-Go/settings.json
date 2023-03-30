@@ -1,6 +1,11 @@
 {
   "country": "is",
-  "appFolders": ["Integrate Currency Feeds"],
-  "testFolders": ["Integrate Currency Feeds.Test"],
-  "bcptTestFolders": []
+  "appFolders": [
+    "Integrate Currency Feeds"
+  ],
+  "testFolders": [
+    "Integrate Currency Feeds.Test"
+  ],
+  "bcptTestFolders": [],
+  "repoVersion": "21.1"
 }
