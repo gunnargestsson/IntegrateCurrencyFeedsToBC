@@ -1,6 +1,7 @@
 codeunit 93553 "O4N Currency Date Test"
 {
     Subtype = Test;
+    TestPermissions = Disabled;
 
     var
         Assert: Codeunit "Library Assert";

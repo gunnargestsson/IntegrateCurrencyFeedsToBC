@@ -1,10 +1,11 @@
 codeunit 93552 "O4N Currency Conversion Test"
 {
     Subtype = Test;
+    TestPermissions = Disabled;
 
     var
         Assert: Codeunit "Library Assert";
-        Any: Codeunit Any;
+    Any: Codeunit Any;
 
     [Test]
     procedure "ServiceInLCY_ConversionCalled_VerifySameExchangeRates"()

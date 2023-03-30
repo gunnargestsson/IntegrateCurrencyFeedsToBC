@@ -1,6 +1,7 @@
 codeunit 93555 "O4N ECB Test"
 {
     Subtype = Test;
+    TestPermissions = Disabled;
 
     var
         Assert: Codeunit "Library Assert";

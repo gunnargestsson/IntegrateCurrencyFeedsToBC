@@ -1,6 +1,7 @@
 codeunit 93551 "O4N Riksbank.se Test"
 {
     Subtype = Test;
+    TestPermissions = Disabled;
 
     var
         Assert: Codeunit "Library Assert";
