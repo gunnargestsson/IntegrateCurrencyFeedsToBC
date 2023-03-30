@@ -205,6 +205,7 @@ codeunit 93551 "O4N Riksbank.se Test"
         CurrencyExchangeRateService: Record "O4N Curr. Exch. Rate Service";
         RiksbankseLatest: Codeunit "O4N Riksbank.se Latest";
         CurrExchRateServSetup: Codeunit "O4N Curr. Exch. Rate Serv Stp";
+        CacheHandler: Codeunit "O4N Cache Handler";
         CurrExchRateUpdateSetupCard: TestPage "Curr. Exch. Rate Service Card";
         CurrExchRates: TestPage "Currency Exchange Rates";
         Response: HttpResponseMessage;
@@ -230,11 +231,14 @@ codeunit 93551 "O4N Riksbank.se Test"
         CurrExchRateLibrary.SetResponse(Response);
 
         // [WHEN] Setup
+        BindSubscription(CacheHandler);
+        CacheHandler.SetCacheUrl('https://d365services4bc.blob.core.windows.net/testxml/f2ef4825b0e74ea98af690cf55666693.xml');
         CurrExchRateUpdateSetupCard.OpenNew();
         CurrExchRateUpdateSetupCard.Code.SetValue(Any.AlphabeticText(MaxStrLen(CurrExchRateUpdateSetup.Code)));
         CurrExchRateUpdateSetupCard.Description.SetValue(Any.AlphabeticText(MaxStrLen(CurrExchRateUpdateSetup.Description)));
         CurrExchRateUpdateSetupCard.ServiceURL.SetValue(CurrencyExchangeRateService.Url);
         UnbindSubscription(CurrExchRateLibrary);
+        UnbindSubscription(CacheHandler);
 
         // [WHEN] Preview 
         Clear(CurrExchRateLibrary);
