@@ -2,7 +2,7 @@
   "id": "f3dd7a3e-f0ef-46c8-9548-87c5dbc136c2",
   "name": "Integrate Currency Feeds",
   "publisher": "Kappi ehf.",
-  "version": "21.1.0.0",
+  "version": "21.2.0.0",
   "brief": "Extending the Currency Update Services to support your local currencies",
   "description": "Bring your own currency exchange feed into Business Central by registering your service codeunit",
   "logo": "logo/Logo250x250.png",
