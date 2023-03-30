@@ -1,0 +1,2 @@
+############## Last Week
+GET https://data.norges-bank.no/api/data/EXR/B..NOK.SP?startPeriod=2020-11-10&endPeriod=2020-11-17&format=sdmx-new-json&locale=en

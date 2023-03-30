@@ -1,0 +1,17 @@
+## Try the default post
+################################################################################
+POST https://d365services4bc.azurewebsites.net/api/StoreInCache?code=<authorization code>
+Content-Type: application/json;charset=UTF-8"
+
+{
+    "Xml": "This is the file"
+}
+
+
+################################################################################
+POST http://localhost:7071/api/StoreInCache
+Content-Type: application/json;charset=UTF-8"
+
+{
+    "Xml": "This is the file"
+}

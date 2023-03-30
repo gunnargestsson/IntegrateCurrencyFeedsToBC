@@ -1,0 +1,2 @@
+##### Todays Exchange Rates
+GET https://www.tcmb.gov.tr/kurlar/today.xml

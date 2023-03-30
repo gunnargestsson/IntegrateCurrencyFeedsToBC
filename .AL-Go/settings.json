@@ -1,6 +1,6 @@
 {
-  "country": "us",
-  "appFolders": [],
-  "testFolders": [],
+  "country": "is",
+  "appFolders": ["Integrate Currency Feeds"],
+  "testFolders": ["Integrate Currency Feeds.Test"],
   "bcptTestFolders": []
 }

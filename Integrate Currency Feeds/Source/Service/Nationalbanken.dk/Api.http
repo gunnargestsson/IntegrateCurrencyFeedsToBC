@@ -1,0 +1,5 @@
+################### Daily Rates
+GET https://www.nationalbanken.dk/_vti_bin/DN/DataService.svc/CurrencyRatesXML?lang=en
+
+################### 5 days rates
+GET https://www.nationalbanken.dk/_vti_bin/DN/DataService.svc/CurrencyRatesHistoryXML?lang=en

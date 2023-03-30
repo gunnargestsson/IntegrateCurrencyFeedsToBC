@@ -1,0 +1,4 @@
+## Try the default post
+################################################################################
+GET https://www.sedlabanki.is/xmltimeseries/Default.aspx?DagsFra=2020-10-09&GroupID=7&Type=xml
+
