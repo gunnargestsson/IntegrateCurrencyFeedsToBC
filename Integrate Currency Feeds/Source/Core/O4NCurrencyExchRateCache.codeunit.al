@@ -18,7 +18,8 @@ codeunit 73401 "O4N Currency Exch. Rate Cache"
         if IsHandled then
             exit;
 
-        if not TryGetSecret(CacheServiceUrlTok, Url) then
+        TryGetSecret(CacheServiceUrlTok, Url);
+        if Url = '' then
             Error(CacheErr);
 
         JObject.Add('Xml', TempBuffer.ReadAsText());
@@ -52,18 +53,22 @@ codeunit 73401 "O4N Currency Exch. Rate Cache"
         exit(Response.IsSuccessStatusCode());
     end;
 
-    [TryFunction]
     [NonDebuggable]
     procedure TryGetSecret(SecretName: Text; var SecretValue: Text)
     var
+        Setup: Record "O4N Connect Exch. Rate Setup";
         SecretProvider: Codeunit "App Key Vault Secret Provider";
         IsHandled: Boolean;
     begin
         IsHandled := false;
         OnBeforeTryGetSecret(SecretName, SecretValue, IsHandled);
         if IsHandled then exit;
-        SecretProvider.TryInitializeFromCurrentApp();
-        SecretProvider.GetSecret(SecretName, SecretValue);
+        if SecretProvider.TryInitializeFromCurrentApp() then
+            if SecretProvider.GetSecret(SecretName, SecretValue) then exit;
+        if not Setup.ReadPermission() then exit;
+        if not Setup.Get() then exit;
+        if Setup."Cache Service Url" = '' then exit;
+        SecretValue := Setup."Cache Service Url";
     end;
 
     [IntegrationEvent(false, false)]

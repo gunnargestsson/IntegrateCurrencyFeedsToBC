@@ -24,6 +24,12 @@ table 73402 "O4N Connect Exch. Rate Setup"
             Caption = 'Starting Date Formula';
             DataClassification = CustomerContent;
         }
+        field(5; "Cache Service Url"; Text[250])
+        {
+            Caption = 'Cache Service Url';
+            DataClassification = CustomerContent;
+            ExtendedDatatype = Url;
+        }
 
     }
 

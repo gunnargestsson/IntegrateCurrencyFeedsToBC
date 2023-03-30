@@ -27,7 +27,6 @@ permissionset 73400 IntegrateCurrFeeds
         codeunit "O4N Curr. Exch. Rate Secret" = X,
         codeunit "O4N Curr. Exch. Rates Helper" = X,
         codeunit "O4N Curr. Exch. Rate Serv Inst" = X,
-        codeunit "O4N Curr. Exch. Rate Serv Stp" = X,
         codeunit "O4N Curr. Exch. Rate Serv Upg" = X,
         codeunit "O4N Currency ISO Mgt" = X,
         codeunit "O4N Currency ISO Notification" = X,

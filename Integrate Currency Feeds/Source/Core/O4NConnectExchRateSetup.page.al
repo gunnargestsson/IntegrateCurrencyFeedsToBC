@@ -22,6 +22,11 @@ page 73402 "O4N Connect Exch. Rate Setup"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the overwrite policy for imported currency exchange rates.';
                 }
+                field("Cache Service Url"; Rec."Cache Service Url")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Cache Service Url field.';
+                }
                 field("Start Date"; Rec."Start Date")
                 {
                     Caption = 'Start Date';

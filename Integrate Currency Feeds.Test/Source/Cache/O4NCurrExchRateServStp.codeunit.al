@@ -1,4 +1,4 @@
-codeunit 73412 "O4N Curr. Exch. Rate Serv Stp"
+codeunit 93558 "O4N Curr. Exch. Rate Serv Stp"
 {
 
     procedure SetApiCallsAllowed()
@@ -6,7 +6,7 @@ codeunit 73412 "O4N Curr. Exch. Rate Serv Stp"
         AppSettings: Record "NAV App Setting";
         CurrentApp: ModuleInfo;
     begin
-        NavApp.GetCurrentModuleInfo(CurrentApp);
+        NavApp.GetModuleInfo('f3dd7a3e-f0ef-46c8-9548-87c5dbc136c2', CurrentApp);
         AppSettings.SetRange("App ID", CurrentApp.Id);
         if AppSettings.IsEmpty() then begin
             AppSettings.Init();

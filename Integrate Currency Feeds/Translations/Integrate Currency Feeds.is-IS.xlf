@@ -3,6 +3,12 @@
   <file datatype="xml" source-language="en-US" target-language="is-IS" original="Integrate Currency Feeds.g.xlf">
     <body>
       <group id="body">
+        <trans-unit id="Table 96542906 - Field 1255430798 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Cache Service Url</source>
+          <target state="translated">Vefslóð biðminnisþjónustu</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table O4N Connect Exch. Rate Setup - Field Cache Service Url - Property Caption</note>
+        </trans-unit>
         <trans-unit id="Table 96542906 - Field 3094658861 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
           <source>Overwrite Policy</source>
           <target state="translated">Skrifa yfir reglu</target>
@@ -442,6 +448,12 @@
           <target state="translated">Almennt</target>
           <note from="Developer" annotates="general" priority="2"></note>
           <note from="Xliff Generator" annotates="general" priority="3">Page O4N Connect Exch. Rate Setup - Control General - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Page 96542906 - Control 1255430798 - Property 1295455071" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Specifies the value of the Cache Service Url field.</source>
+          <target state="translated">TIlgreinir vefslóð biðminnisþjónustu sem er nauðsynleg til uppsetningar á þjónustunni.</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page O4N Connect Exch. Rate Setup - Control Cache Service Url - Property ToolTip</note>
         </trans-unit>
         <trans-unit id="Page 96542906 - Control 3094658861 - Property 1295455071" size-unit="char" translate="yes" xml:space="preserve">
           <source>Specifies the overwrite policy for imported currency exchange rates.</source>
