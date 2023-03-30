@@ -1,9 +1,6 @@
 {
   "folders": [
     {
-      "path": ".AL-Go"
-    },
-    {
       "path": "Integrate Currency Feeds"
     },
     {
@@ -93,6 +90,8 @@
   "alOutline.stripNonAlphanumericCharactersFromObjectNames": true,
   "cSpell.words": [
       "Kappi"
-  ]
+  ],
+  "NAB.UseDTS": true,
+  "NAB.DTS ProjectId": "62702"
   }
 }
