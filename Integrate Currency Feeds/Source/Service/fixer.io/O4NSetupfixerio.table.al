@@ -1,6 +1,6 @@
 table 73425 "O4N Setup fixer.io"
 {
-    DataClassification = CustomerContent;
+    DataClassification = SystemMetadata;
 
     fields
     {
@@ -16,7 +16,7 @@ table 73425 "O4N Setup fixer.io"
         }
         field(4; "Subscription Type"; Enum "O4N fixer.io Subscription Type")
         {
-            DataClassification = CustomerContent;
+            DataClassification = SystemMetadata;
             Caption = 'Subscription Type';
         }
     }

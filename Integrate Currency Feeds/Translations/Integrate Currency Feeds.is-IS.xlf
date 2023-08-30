@@ -3,6 +3,24 @@
   <file datatype="xml" source-language="en-US" target-language="is-IS" original="Integrate Currency Feeds.g.xlf">
     <body>
       <group id="body">
+        <trans-unit id="Table 2584970738 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Arion Banki Setup</source>
+          <target state="translated">Uppsetning Arion banka</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table O4N Arion Banki Setup - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2584970738 - Field 1663593181 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Primary Key</source>
+          <target state="translated" state-qualifier="exact-match">Aðallykill</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table O4N Arion Banki Setup - Field Primary Key - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2584970738 - Field 29090838 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Rate Type</source>
+          <target state="translated" state-qualifier="exact-match">Tegund gengis</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table O4N Arion Banki Setup - Field Rate Type - Property Caption</note>
+        </trans-unit>
         <trans-unit id="Table 96542906 - Field 1255430798 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
           <source>Cache Service Url</source>
           <target state="translated">Vefslóð biðminnisþjónustu</target>
@@ -221,6 +239,18 @@
           <note from="Developer" annotates="general" priority="2"></note>
           <note from="Xliff Generator" annotates="general" priority="3">Table O4N tcmb.gov.tr Setup - Field Rate Type - Property Caption</note>
         </trans-unit>
+        <trans-unit id="Codeunit 4199969477 - NamedType 3100321899" maxwidth="100" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Downloads missing exchange rates</source>
+          <target state="translated" state-qualifier="exact-match">Niðurhal vantar gengi</target>
+          <note from="Developer" annotates="general" priority="2">%1 = Web Service Url</note>
+          <note from="Xliff Generator" annotates="general" priority="3">Codeunit O4N Arion Period - NamedType DescTok</note>
+        </trans-unit>
+        <trans-unit id="Codeunit 4199969477 - Method 2894793807 - NamedType 1803812000" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Error Code: %1\%2</source>
+          <target state="translated" state-qualifier="exact-match">Villukóði: %1\%2</target>
+          <note from="Developer" annotates="general" priority="2">%1 = Response Error Code, %2 = Response Error Phrase</note>
+          <note from="Xliff Generator" annotates="general" priority="3">Codeunit O4N Arion Period - Method DownloadXml - NamedType RequestErr</note>
+        </trans-unit>
         <trans-unit id="Codeunit 1055492337 - Method 360496938 - NamedType 4077039996" size-unit="char" translate="yes" xml:space="preserve">
           <source>Web Request Error.\Status Code: %1\Status Message: %2\Content: %3</source>
           <target state="translated">Vefbeiðnivilla.\Stöðukóði: %1\Stöðuboð: %2\Efni: %3</target>
@@ -436,6 +466,24 @@
           <target state="translated">Villukóði: %1\%2</target>
           <note from="Developer" annotates="general" priority="2">%1 = Response Error Code, %2 = Response Error Phrase</note>
           <note from="Xliff Generator" annotates="general" priority="3">Codeunit O4N Xe.com Period - Method DownloadJson - NamedType RequestErr</note>
+        </trans-unit>
+        <trans-unit id="Page 2584970738 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Arion Banki Setup</source>
+          <target state="translated">Uppsetning Arion banka</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page O4N Arion Banki Setup - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Page 2584970738 - Control 2445482498 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>General</source>
+          <target state="translated" state-qualifier="exact-match">Almennt</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page O4N Arion Banki Setup - Control General - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Page 2584970738 - Control 29090838 - Property 1295455071" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Specifies the rate type to be downloaded from Arion Banki</source>
+          <target state="translated">Tilgreinir gengistegund til niðurhals frá Arion banka</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page O4N Arion Banki Setup - Control Rate Type - Property ToolTip</note>
         </trans-unit>
         <trans-unit id="Page 96542906 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
           <source>Connect Exch. Rate Setup</source>
@@ -870,6 +918,24 @@
           <target state="translated">O4N-gjaldmiðilsafmörkun</target>
           <note from="Developer" annotates="general" priority="2"></note>
           <note from="Xliff Generator" annotates="general" priority="3">TableExtension O4N Curr. Exch. Rate Serv. Ext - Field O4N Currency Filter - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Enum 3341549605 - EnumValue 395510365 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Purchase</source>
+          <target state="translated" state-qualifier="exact-match">Innkaup</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Enum O4N Arion Banki Rate Type - EnumValue Purchase - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Enum 3341549605 - EnumValue 1406942772 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Sales</source>
+          <target state="translated" state-qualifier="exact-match">Sala</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Enum O4N Arion Banki Rate Type - EnumValue Sales - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Enum 3341549605 - EnumValue 296807932 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Sales/Purchase Average</source>
+          <target state="translated">Meðaltal sölu- og kaupgengis</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Enum O4N Arion Banki Rate Type - EnumValue SalesPurchaseAverage - Property Caption</note>
         </trans-unit>
         <trans-unit id="Enum 3535451507 - EnumValue 3703598467 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
           <source>All</source>

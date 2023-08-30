@@ -17,6 +17,8 @@ permissionset 73400 IntegrateCurrFeeds
         tabledata "O4N tcmb.gov.tr Setup" = RMID,
         table "O4N Setup xe.com" = X,
         tabledata "O4N Setup xe.com" = RMID,
+        table "O4N Arion Banki Setup" = X,
+        tabledata "O4N Arion Banki Setup" = RMID,
         codeunit "O4N Currency Conversion" = X,
         codeunit "O4N Currency Date Mgt." = X,
         codeunit "O4N Currency Exch. Rate Event" = X,
@@ -49,5 +51,6 @@ permissionset 73400 IntegrateCurrFeeds
         page "O4N Sedlabanki.is Setup" = X,
         page "O4N tcmb.gov.tr Setup" = X,
         page "O4N Setup xe.com" = X,
+        page "O4N Arion Banki Setup" = X,
         xmlport "O4N Currency Exch. Rate Xml" = X;
 }

@@ -1,7 +1,7 @@
 table 73400 "O4N Curr. Exch. Rate Service"
 {
     Caption = 'Currency Exch. Rate Service';
-    DataClassification = CustomerContent;
+    DataClassification = SystemMetadata;
     LookupPageId = "O4N Curr. Exch. Rate Services";
     DrillDownPageId = "O4N Curr. Exch. Rate Services";
 
@@ -10,18 +10,18 @@ table 73400 "O4N Curr. Exch. Rate Service"
         field(1; Url; Text[250])
         {
             Caption = 'Url';
-            DataClassification = CustomerContent;
+            DataClassification = SystemMetadata;
         }
         field(2; "Codeunit Id"; Integer)
         {
             Caption = 'Codeunit Id';
-            DataClassification = CustomerContent;
+            DataClassification = SystemMetadata;
             TableRelation = AllObj."Object ID" where("Object Type" = const(Codeunit));
         }
         field(4; Description; Text[250])
         {
             Caption = 'Description';
-            DataClassification = CustomerContent;
+            DataClassification = SystemMetadata;
         }
         field(5; "Setup Page Id"; Integer)
         {

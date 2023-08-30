@@ -1,6 +1,6 @@
 table 73424 "O4N Setup xe.com"
 {
-    DataClassification = CustomerContent;
+    DataClassification = SystemMetadata;
 
     fields
     {
@@ -21,37 +21,37 @@ table 73424 "O4N Setup xe.com"
         }
         field(4; "Subscription Id"; Guid)
         {
-            DataClassification = CustomerContent;
+            DataClassification = SystemMetadata;
             Caption = 'Subscription Id';
         }
         field(5; "Organization"; Text[250])
         {
-            DataClassification = CustomerContent;
+            DataClassification = SystemMetadata;
             Caption = 'Organization';
         }
         field(6; "Package"; Code[50])
         {
-            DataClassification = CustomerContent;
+            DataClassification = SystemMetadata;
             Caption = 'Package';
         }
         field(7; "Subscription Start Time"; DateTime)
         {
-            DataClassification = CustomerContent;
+            DataClassification = SystemMetadata;
             Caption = 'Subscription Start Time';
         }
         field(8; "Subscription End Time"; DateTime)
         {
-            DataClassification = CustomerContent;
+            DataClassification = SystemMetadata;
             Caption = 'Subscription End Time';
         }
         field(9; "Package Limit"; Integer)
         {
-            DataClassification = CustomerContent;
+            DataClassification = SystemMetadata;
             Caption = 'Package Limit';
         }
         field(10; "Package Limit Remaining"; Integer)
         {
-            DataClassification = CustomerContent;
+            DataClassification = SystemMetadata;
             Caption = 'Package Limit Remaining';
         }
     }
