@@ -1,17 +1,17 @@
 page 73403 "O4N Arion Banki Setup"
 {
     Caption = 'Arion Banki Setup';
+    DeleteAllowed = false;
+    InsertAllowed = false;
+    ModifyAllowed = true;
     PageType = Card;
+    ShowFilter = false;
     SourceTable = "O4N Arion Banki Setup";
     UsageCategory = None;
-    InsertAllowed = false;
-    DeleteAllowed = false;
-    ModifyAllowed = true;
-    ShowFilter = false;
 
     layout
     {
-        area(content)
+        area(Content)
         {
             group(General)
             {

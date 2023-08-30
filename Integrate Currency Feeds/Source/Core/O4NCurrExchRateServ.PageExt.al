@@ -1,4 +1,4 @@
-pageextension 73400 "O4NCurrExchRateServ" extends "Curr. Exch. Rate Service Card"
+pageextension 73400 O4NCurrExchRateServ extends "Curr. Exch. Rate Service Card"
 {
     layout
     {
@@ -40,10 +40,6 @@ pageextension 73400 "O4NCurrExchRateServ" extends "Curr. Exch. Rate Service Card
         }
     }
 
-    actions
-    {
-
-    }
 
     var
         TempCurrencyBuffer: Record "O4N Currency Buffer" temporary;
@@ -64,7 +60,7 @@ pageextension 73400 "O4NCurrExchRateServ" extends "Curr. Exch. Rate Service Card
         CurrencyFilter := TempCurrencyBuffer.GetFiltersAsTextDisplay(Rec);
     end;
 
-    /// <summary> 
+    /// <summary>
     /// Description for O4NOnAfterValidateServiceURL.
     /// </summary>
     /// <param name="CurrExchRateUpdateSetup">Parameter of type Record "Curr. Exch. Rate Update Setup".</param>

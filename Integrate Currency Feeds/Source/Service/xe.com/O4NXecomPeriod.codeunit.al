@@ -6,19 +6,19 @@ codeunit 73424 "O4N Xe.com Period"
     trigger OnRun()
     var
         CompanyInfo: Record "Company Information";
-        GLSetup: Record "General Ledger Setup";
         Country: Record "Country/Region";
-        Setup: Record "O4N Setup xe.com";
         TempCurrencyExchangeRate: Record "Currency Exchange Rate" temporary;
+        GLSetup: Record "General Ledger Setup";
+        Setup: Record "O4N Setup xe.com";
         DateMgt: Codeunit "O4N Currency Date Mgt.";
         CurrencyFilter: Codeunit "O4N Currency Filter Mgt.";
+        CurrencyDate: Date;
+        EndDate: Date;
+        StartDate: Date;
         JObject: JsonObject;
         OutStr: OutStream;
-        ToCurrencyCodeList: Text;
         Authorization: Text;
-        StartDate: Date;
-        EndDate: Date;
-        CurrencyDate: Date;
+        ToCurrencyCodeList: Text;
     begin
         GLSetup.Get();
         GLSetup.TestField("LCY Code");
@@ -47,29 +47,13 @@ codeunit 73424 "O4N Xe.com Period"
         Rec.Modify();
     end;
 
-    local procedure DownloadJson(FromCurrencyCode: Code[10]; ToCurrencyCodeList: Text; CurrencyDate: Date; Authorization: Text; var ResponseJson: JsonObject)
     var
-        RequestUrlTok: Label 'https://xecdapi.xe.com/v1/historic_rate.json/?from=%1&date=%2&to=%3', Locked = true;
-        RequestErr: Label 'Error Code: %1\%2', Comment = '%1 = Response Error Code, %2 = Response Error Phrase';
-        Client: HttpClient;
-        Request: HttpRequestMessage;
-        Response: HttpResponseMessage;
-        InStr: InStream;
-        IsHandled: Boolean;
-    begin
-        Client.DefaultRequestHeaders.Add('Authorization', Authorization);
-        Request.SetRequestUri(StrSubstNo(RequestUrlTok, FromCurrencyCode, Format(CurrencyDate, 0, 9), ToCurrencyCodeList));
-        Request.Method('GET');
-        CurrHelper.OnBeforeClientSend(UrlTok, Request, Response, IsHandled);
-        if not IsHandled then
-            Client.Send(Request, Response);
-        HttpHelper.ThrowError(Response);
-        HttpHelper.CreateInStream(InStr);
-        Response.Content.ReadAs(InStr);
-        HttpHelper.ReadInStr(InStr, ResponseJson);
-        if not Response.IsSuccessStatusCode then
-            Error(RequestErr, Response.HttpStatusCode, Response.ReasonPhrase);
-    end;
+        HttpHelper: Codeunit "O4N Curr. Exch. Rate Http";
+        CurrHelper: Codeunit "O4N Curr. Exch. Rates Helper";
+        DescTok: Label 'Downloads missing exchange rates', Comment = '%1 = Web Service Url', MaxLength = 100;
+        ServiceProviderTok: Label 'https://www.xe.com/xecurrencydata/#integration', MaxLength = 250, Locked = true;
+        SetupMissingErr: Label 'Xe.com Setup is missing';
+        UrlTok: Label 'https://D365Connect.com/ANY/xe.com/period', Locked = true, MaxLength = 250;
 
     procedure ReadJson(var JObject: JsonObject; CurrencyDate: Date; var TempCurrencyExchangeRate: Record "Currency Exchange Rate")
     var
@@ -92,15 +76,7 @@ codeunit 73424 "O4N Xe.com Period"
         CurrHelper.OnAfterReadJson(UrlTok, JObject, TempCurrencyExchangeRate);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"O4N Curr. Exch. Rate Service", 'DiscoverCurrencyMappingCodeunits', '', false, false)]
-    local procedure DiscoverCurrencyMappingCodeunits()
-    var
-        CurrencyExchangeRateService: Record "O4N Curr. Exch. Rate Service";
-    begin
-        RegisterService(CurrencyExchangeRateService);
-    end;
-
-    /// <summary> 
+    /// <summary>
     /// Register this Connected Exchange Rate Service method into the Connected Exchange Rate Service method list.
     /// </summary>
     procedure RegisterService(var CurrencyExchangeRateService: Record "O4N Curr. Exch. Rate Service")
@@ -115,11 +91,35 @@ codeunit 73424 "O4N Xe.com Period"
         CurrencyExchangeRateService.Insert(true);
     end;
 
+    local procedure DownloadJson(FromCurrencyCode: Code[10]; ToCurrencyCodeList: Text; CurrencyDate: Date; Authorization: Text; var ResponseJson: JsonObject)
     var
-        HttpHelper: Codeunit "O4N Curr. Exch. Rate Http";
-        CurrHelper: Codeunit "O4N Curr. Exch. Rates Helper";
-        UrlTok: label 'https://D365Connect.com/ANY/xe.com/period', Locked = true, MaxLength = 250;
-        DescTok: Label 'Downloads missing exchange rates', Comment = '%1 = Web Service Url', MaxLength = 100;
-        ServiceProviderTok: Label 'https://www.xe.com/xecurrencydata/#integration', MaxLength = 250, Locked = true;
-        SetupMissingErr: Label 'Xe.com Setup is missing';
+        IsHandled: Boolean;
+        Client: HttpClient;
+        Request: HttpRequestMessage;
+        Response: HttpResponseMessage;
+        InStr: InStream;
+        RequestErr: Label 'Error Code: %1\%2', Comment = '%1 = Response Error Code, %2 = Response Error Phrase';
+        RequestUrlTok: Label 'https://xecdapi.xe.com/v1/historic_rate.json/?from=%1&date=%2&to=%3', Locked = true;
+    begin
+        Client.DefaultRequestHeaders.Add('Authorization', Authorization);
+        Request.SetRequestUri(StrSubstNo(RequestUrlTok, FromCurrencyCode, Format(CurrencyDate, 0, 9), ToCurrencyCodeList));
+        Request.Method('GET');
+        CurrHelper.OnBeforeClientSend(UrlTok, Request, Response, IsHandled);
+        if not IsHandled then
+            Client.Send(Request, Response);
+        HttpHelper.ThrowError(Response);
+        HttpHelper.CreateInStream(InStr);
+        Response.Content.ReadAs(InStr);
+        HttpHelper.ReadInStr(InStr, ResponseJson);
+        if not Response.IsSuccessStatusCode then
+            Error(RequestErr, Response.HttpStatusCode, Response.ReasonPhrase);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"O4N Curr. Exch. Rate Service", 'DiscoverCurrencyMappingCodeunits', '', false, false)]
+    local procedure DiscoverCurrencyMappingCodeunits()
+    var
+        CurrencyExchangeRateService: Record "O4N Curr. Exch. Rate Service";
+    begin
+        RegisterService(CurrencyExchangeRateService);
+    end;
 }

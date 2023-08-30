@@ -1,7 +1,7 @@
 table 73402 "O4N Connect Exch. Rate Setup"
 {
+    Caption = 'O4N Connect Exch. Rate Setup';
     DataClassification = SystemMetadata;
-
     fields
     {
         field(1; "Primary Key"; Code[10])
@@ -9,7 +9,7 @@ table 73402 "O4N Connect Exch. Rate Setup"
             Caption = 'Primary Key';
             DataClassification = SystemMetadata;
         }
-        field(2; "Overwrite Policy"; enum "O4N Currency Overwrite Type")
+        field(2; "Overwrite Policy"; Enum "O4N Currency Overwrite Type")
         {
             Caption = 'Overwrite Policy';
             DataClassification = SystemMetadata;
@@ -30,7 +30,6 @@ table 73402 "O4N Connect Exch. Rate Setup"
             DataClassification = SystemMetadata;
             ExtendedDatatype = Url;
         }
-
     }
 
     keys
@@ -43,22 +42,18 @@ table 73402 "O4N Connect Exch. Rate Setup"
 
     trigger OnInsert()
     begin
-
     end;
 
     trigger OnModify()
     begin
-
     end;
 
     trigger OnDelete()
     begin
-
     end;
 
     trigger OnRename()
     begin
-
     end;
 
     /// <summary>
@@ -78,5 +73,4 @@ table 73402 "O4N Connect Exch. Rate Setup"
             if "Start Date" > StartDate then
                 StartDate := "Start Date";
     end;
-
 }

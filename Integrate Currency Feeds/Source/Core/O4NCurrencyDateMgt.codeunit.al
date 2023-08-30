@@ -1,6 +1,5 @@
 codeunit 73403 "O4N Currency Date Mgt."
 {
-
     procedure GetCurrencyPeriod(Url: Text; GetStructure: Boolean; CountryCode: Code[3]; var StartDate: Date; var EndDate: Date)
     begin
         if GetStructure then begin
@@ -12,16 +11,34 @@ codeunit 73403 "O4N Currency Date Mgt."
         end;
     end;
 
-    local procedure GetStructureDate(CountryCode: Code[3]) CurrencyDate: Date
-    var
-        IsHoliday: Boolean;
+    local procedure FindEndDate(Url: Text; StartDate: Date) EndDate: Date
     begin
-        CurrencyDate := CalcDate('<-1W-CW>', Today());
-        if TryGetIsPublicHoliday(CountryCode, CurrencyDate, IsHoliday) then;
-        while (Date2DWY(CurrencyDate, 1) >= 6) or (IsHoliday) do begin
-            CurrencyDate := CurrencyDate - 3;
-            if TryGetIsPublicHoliday(CountryCode, CurrencyDate, IsHoliday) then;
-        end;
+        EndDate := Today();
+        if EndDate < StartDate then
+            EndDate := StartDate;
+        OnAfterFindEndDate(Url, StartDate, EndDate);
+    end;
+
+    local procedure FindFirstGLEntry(var StartDate: Date): Boolean
+    var
+        GLEntry: Record "G/L Entry";
+    begin
+        if GLEntry.IsEmpty() then exit;
+        GLEntry.SetCurrentKey("Posting Date");
+        GLEntry.FindFirst();
+        StartDate := GLEntry."Posting Date";
+        exit(true);
+    end;
+
+    local procedure FindLastCurrencyExchangeRate(var StartDate: Date): Boolean
+    var
+        CurrencyExchangeRate: Record "Currency Exchange Rate";
+    begin
+        if CurrencyExchangeRate.IsEmpty() then exit;
+        CurrencyExchangeRate.SetCurrentKey("Starting Date");
+        CurrencyExchangeRate.FindLast();
+        StartDate := CurrencyExchangeRate."Starting Date";
+        exit(true);
     end;
 
     local procedure FindStartDate(Url: Text) StartDate: Date
@@ -37,34 +54,16 @@ codeunit 73403 "O4N Currency Date Mgt."
         OnAfterFindStartDate(Url, StartDate);
     end;
 
-    local procedure FindEndDate(Url: Text; StartDate: Date) EndDate: Date
-    begin
-        EndDate := Today();
-        if EndDate < StartDate then
-            EndDate := StartDate;
-        OnAfterFindEndDate(Url, StartDate, EndDate);
-    end;
-
-    local procedure FindLastCurrencyExchangeRate(var StartDate: Date): Boolean
+    local procedure GetStructureDate(CountryCode: Code[3]) CurrencyDate: Date
     var
-        CurrencyExchangeRate: Record "Currency Exchange Rate";
+        IsHoliday: Boolean;
     begin
-        if CurrencyExchangeRate.IsEmpty() then exit;
-        CurrencyExchangeRate.SetCurrentKey("Starting Date");
-        CurrencyExchangeRate.FindLast();
-        StartDate := CurrencyExchangeRate."Starting Date";
-        exit(true);
-    end;
-
-    local procedure FindFirstGLEntry(var StartDate: Date): Boolean
-    var
-        GLEntry: Record "G/L Entry";
-    begin
-        if GLEntry.IsEmpty() then exit;
-        GLEntry.SetCurrentKey("Posting Date");
-        GLEntry.FindFirst();
-        StartDate := GLEntry."Posting Date";
-        exit(true);
+        CurrencyDate := CalcDate('<-1W-CW>', Today());
+        if TryGetIsPublicHoliday(CountryCode, CurrencyDate, IsHoliday) then;
+        while (Date2DWY(CurrencyDate, 1) >= 6) or (IsHoliday) do begin
+            CurrencyDate := CurrencyDate - 3;
+            if TryGetIsPublicHoliday(CountryCode, CurrencyDate, IsHoliday) then;
+        end;
     end;
 
     [TryFunction]
@@ -72,10 +71,10 @@ codeunit 73403 "O4N Currency Date Mgt."
     var
         Client: HttpClient;
         Respose: HttpResponseMessage;
-        ResponseText: Text;
         Day: JsonToken;
         IsPublicHoliday: JsonToken;
         UrlTok: Label 'https://kayaposoft.com/enrico/json/v2.0/?action=isPublicHoliday&date=%2&country=%1', Comment = '%1 = Country Code; %2 = Date';
+        ResponseText: Text;
     begin
         Client.Get(StrSubstNo(UrlTok, CountryCode, Format(CurrencyDate, 0, '<Day,2>-<Month,2>-<Year4>')), Respose);
         Respose.Content.ReadAs(ResponseText);
@@ -84,7 +83,6 @@ codeunit 73403 "O4N Currency Date Mgt."
         if Day.AsObject().Get('isPublicHoliday', IsPublicHoliday) then
             IsHoliday := IsPublicHoliday.AsValue().AsBoolean();
     end;
-
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"O4N Curr. Exch. Rates Helper", 'OnBeforeAddCurrencyExchangeRate', '', false, false)]
     local procedure OnBeforeAddCurrencyExchangeRate(var CurrencyExchangeRate: Record "Currency Exchange Rate")
@@ -96,12 +94,12 @@ codeunit 73403 "O4N Currency Date Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterFindStartDate(Url: Text; var StartDate: Date)
+    local procedure OnAfterFindEndDate(Url: Text; StartDate: Date; var EndDate: Date)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterFindEndDate(Url: Text; StartDate: Date; var EndDate: Date)
+    local procedure OnAfterFindStartDate(Url: Text; var StartDate: Date)
     begin
     end;
 }

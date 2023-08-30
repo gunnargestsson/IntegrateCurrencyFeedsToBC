@@ -1,15 +1,15 @@
 page 73401 "O4N Currency ISO List"
 {
     Caption = 'Connect Currency ISO List';
+    Editable = false;
     PageType = List;
     SourceTable = Currency;
     SourceTableTemporary = true;
     UsageCategory = None;
-    Editable = false;
 
     layout
     {
-        area(content)
+        area(Content)
         {
             repeater(General)
             {
@@ -43,5 +43,4 @@ page 73401 "O4N Currency ISO List"
     begin
         CurrencyISOMgt.GetISOList(Rec);
     end;
-
 }

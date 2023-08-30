@@ -5,15 +5,15 @@ codeunit 73421 "O4N Sedlabanki.is Period"
 
     trigger OnRun()
     var
-        GLSetup: Record "General Ledger Setup";
         TempCurrencyExchangeRate: Record "Currency Exchange Rate" temporary;
+        GLSetup: Record "General Ledger Setup";
         CurrencyConvertion: Codeunit "O4N Currency Conversion";
-        CurrencyFilter: Codeunit "O4N Currency Filter Mgt.";
         DateMgt: Codeunit "O4N Currency Date Mgt.";
-        Xml: XmlDocument;
-        OutStr: OutStream;
-        StartDate: Date;
+        CurrencyFilter: Codeunit "O4N Currency Filter Mgt.";
         EndDate: Date;
+        StartDate: Date;
+        OutStr: OutStream;
+        Xml: XmlDocument;
     begin
         GLSetup.Get();
         GLSetup.TestField("LCY Code");
@@ -37,41 +37,27 @@ codeunit 73421 "O4N Sedlabanki.is Period"
         Rec.Modify();
     end;
 
-    local procedure DownloadXml(StartDate: Date; EndDate: Date; GroupId: Integer; var ResponseXml: XmlDocument)
     var
-        RequestUrlTok: Label 'https://www.sedlabanki.is/xmltimeseries/Default.aspx?DagsFra=%1&DagsTil=%2&GroupID=%3&Type=xml', Locked = true;
-        RequestErr: Label 'Error Code: %1\%2', Comment = '%1 = Response Error Code, %2 = Response Error Phrase';
-        Client: HttpClient;
-        Request: HttpRequestMessage;
-        Response: HttpResponseMessage;
-        InStr: InStream;
-
-        IsHandled: Boolean;
-    begin
-        Request.SetRequestUri(StrSubstNo(RequestUrlTok, Format(StartDate, 0, 9), Format(CreateDateTime(EndDate, 235959T), 0, 9), GroupId));
-        Request.Method('GET');
-        CurrHelper.OnBeforeClientSend(UrlTok, Request, Response, IsHandled);
-        if not IsHandled then
-            Client.Send(Request, Response);
-        HttpHelper.ThrowError(Response);
-        HttpHelper.CreateInStream(InStr);
-        Response.Content.ReadAs(InStr);
-        HttpHelper.ReadInStr(InStr, ResponseXml);
-        if not Response.IsSuccessStatusCode then
-            Error(RequestErr, Response.HttpStatusCode, Response.ReasonPhrase);
-    end;
+        HttpHelper: Codeunit "O4N Curr. Exch. Rate Http";
+        CurrHelper: Codeunit "O4N Curr. Exch. Rates Helper";
+        AverageTypeTok: Label 'skráð miðgengi.', Locked = true;
+        DescTok: Label 'Downloads missing exchange rates', Comment = '%1 = Web Service Url', MaxLength = 100;
+        PurchaseTypeTok: Label 'skráð kaupgengi.', Locked = true;
+        SalesTypeTok: Label 'skráð sölugengi.', Locked = true;
+        ServiceProviderTok: Label 'https://www.sedlabanki.is/hagtolur/xml-gogn/', MaxLength = 250, Locked = true;
+        UrlTok: Label 'https://D365Connect.com/ISK/sedlabanki.is/period', Locked = true, MaxLength = 250;
 
     procedure ReadXml(var Xml: XmlDocument; var TempCurrencyExchangeRate: Record "Currency Exchange Rate")
     var
         Setup: Record "O4N Sedlabanki.is Setup";
         TypeHelper: Codeunit "Type Helper";
-        Currencies: XmlNodeList;
-        Currency: XmlNode;
-        Series: XmlNode;
-        Node: XmlNode;
-        Rows: XmlNodeList;
-        Row: XmlNode;
         NodeValue: Variant;
+        Currency: XmlNode;
+        Node: XmlNode;
+        Row: XmlNode;
+        Series: XmlNode;
+        Currencies: XmlNodeList;
+        Rows: XmlNodeList;
     begin
         if not Xml.SelectNodes('//*[local-name()="TimeSeries"]', Currencies) then exit;
         if not Setup.Get() then
@@ -104,15 +90,7 @@ codeunit 73421 "O4N Sedlabanki.is Period"
         CurrHelper.OnAfterReadXml(UrlTok, Xml, TempCurrencyExchangeRate);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"O4N Curr. Exch. Rate Service", 'DiscoverCurrencyMappingCodeunits', '', false, false)]
-    local procedure DiscoverCurrencyMappingCodeunits()
-    var
-        CurrencyExchangeRateService: Record "O4N Curr. Exch. Rate Service";
-    begin
-        RegisterService(CurrencyExchangeRateService);
-    end;
-
-    /// <summary> 
+    /// <summary>
     /// Register this Connected Exchange Rate Service method into the Connected Exchange Rate Service method list.
     /// </summary>
     procedure RegisterService(var CurrencyExchangeRateService: Record "O4N Curr. Exch. Rate Service")
@@ -127,15 +105,35 @@ codeunit 73421 "O4N Sedlabanki.is Period"
         CurrencyExchangeRateService.Insert(true);
     end;
 
-
-
+    local procedure DownloadXml(StartDate: Date; EndDate: Date; GroupId: Integer; var ResponseXml: XmlDocument)
     var
-        HttpHelper: Codeunit "O4N Curr. Exch. Rate Http";
-        CurrHelper: Codeunit "O4N Curr. Exch. Rates Helper";
-        UrlTok: label 'https://D365Connect.com/ISK/sedlabanki.is/period', Locked = true, MaxLength = 250;
-        DescTok: Label 'Downloads missing exchange rates', Comment = '%1 = Web Service Url', MaxLength = 100;
-        ServiceProviderTok: Label 'https://www.sedlabanki.is/hagtolur/xml-gogn/', MaxLength = 250, Locked = true;
-        SalesTypeTok: Label 'skráð sölugengi.', Locked = true;
-        PurchaseTypeTok: Label 'skráð kaupgengi.', Locked = true;
-        AverageTypeTok: Label 'skráð miðgengi.', Locked = true;
+
+        IsHandled: Boolean;
+        Client: HttpClient;
+        Request: HttpRequestMessage;
+        Response: HttpResponseMessage;
+        InStr: InStream;
+        RequestErr: Label 'Error Code: %1\%2', Comment = '%1 = Response Error Code, %2 = Response Error Phrase';
+        RequestUrlTok: Label 'https://www.sedlabanki.is/xmltimeseries/Default.aspx?DagsFra=%1&DagsTil=%2&GroupID=%3&Type=xml', Locked = true;
+    begin
+        Request.SetRequestUri(StrSubstNo(RequestUrlTok, Format(StartDate, 0, 9), Format(CreateDateTime(EndDate, 235959T), 0, 9), GroupId));
+        Request.Method('GET');
+        CurrHelper.OnBeforeClientSend(UrlTok, Request, Response, IsHandled);
+        if not IsHandled then
+            Client.Send(Request, Response);
+        HttpHelper.ThrowError(Response);
+        HttpHelper.CreateInStream(InStr);
+        Response.Content.ReadAs(InStr);
+        HttpHelper.ReadInStr(InStr, ResponseXml);
+        if not Response.IsSuccessStatusCode then
+            Error(RequestErr, Response.HttpStatusCode, Response.ReasonPhrase);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"O4N Curr. Exch. Rate Service", 'DiscoverCurrencyMappingCodeunits', '', false, false)]
+    local procedure DiscoverCurrencyMappingCodeunits()
+    var
+        CurrencyExchangeRateService: Record "O4N Curr. Exch. Rate Service";
+    begin
+        RegisterService(CurrencyExchangeRateService);
+    end;
 }

@@ -1,17 +1,17 @@
 page 73425 "O4N Setup fixer.io"
 {
     Caption = 'Setup fixer.io';
+    DeleteAllowed = false;
+    InsertAllowed = false;
+    ModifyAllowed = true;
     PageType = Card;
+    ShowFilter = false;
     SourceTable = "O4N Setup fixer.io";
     UsageCategory = None;
-    InsertAllowed = false;
-    DeleteAllowed = false;
-    ModifyAllowed = true;
-    ShowFilter = false;
 
     layout
     {
-        area(content)
+        area(Content)
         {
             group(Authentication)
             {
@@ -19,10 +19,10 @@ page 73425 "O4N Setup fixer.io"
 
                 field("Account API Key"; AccountAPIKey)
                 {
-                    Caption = 'Account API Key';
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Account API Key for the service.';
+                    Caption = 'Account API Key';
                     ExtendedDatatype = Masked;
+                    ToolTip = 'Specifies the value of the Account API Key for the service.';
                     trigger OnValidate()
                     begin
                         SecretService.StoreSecret(Rec."Account API Key Storage Key", AccountAPIKey);
@@ -34,12 +34,11 @@ page 73425 "O4N Setup fixer.io"
                 Caption = 'Subscription';
                 field("Subscription Type"; Rec."Subscription Type")
                 {
-                    Caption = 'Subscription Type';
                     ApplicationArea = All;
+                    Caption = 'Subscription Type';
                     ToolTip = 'Specifies the subscription type for fixer.io.  Subscription type will affect the request made from Business Central to fixer.io.';
                 }
             }
-
         }
     }
 
@@ -59,5 +58,4 @@ page 73425 "O4N Setup fixer.io"
     begin
         AccountAPIKey := SecretService.GetSecret(Rec."Account API Key Storage Key");
     end;
-
 }

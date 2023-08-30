@@ -162,7 +162,7 @@ codeunit 93553 "O4N Currency Date Test"
     begin
         CurrencyExchangeRates.Init();
         CurrencyExchangeRates."Starting Date" := Any.DateInRange(Today() - 50, 25);
-        CurrencyExchangeRates."Currency Code" := Any.AlphabeticText(MaxStrLen(CurrencyExchangeRates."Currency Code"));
+        CurrencyExchangeRates."Currency Code" := CopyStr(Any.AlphabeticText(MaxStrLen(CurrencyExchangeRates."Currency Code")), 1, MaxStrLen(CurrencyExchangeRates."Currency Code"));
         CurrencyExchangeRates.Insert();
     end;
 }

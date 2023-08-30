@@ -2,9 +2,14 @@ codeunit 73405 "O4N Curr. Exch. Rate Http"
 {
     trigger OnRun()
     begin
-
     end;
 
+    procedure CreateInStream(var InStr: InStream)
+    var
+        TempBlob: Codeunit "Temp Blob";
+    begin
+        TempBlob.CreateInStream(InStr, TextEncoding::UTF8);
+    end;
 
     procedure ReadInStr(var InStr: InStream; var ResponseXml: XmlDocument)
     var
@@ -30,13 +35,6 @@ codeunit 73405 "O4N Curr. Exch. Rate Http"
     begin
         TempBlob.CreateOutStream(OutStr);
         CopyStream(OutStr, InStr);
-    end;
-
-    procedure CreateInStream(var InStr: InStream)
-    var
-        TempBlob: Codeunit "Temp Blob";
-    begin
-        TempBlob.CreateInStream(InStr, TextEncoding::UTF8);
     end;
 
     procedure ThrowError(var Response: HttpResponseMessage)

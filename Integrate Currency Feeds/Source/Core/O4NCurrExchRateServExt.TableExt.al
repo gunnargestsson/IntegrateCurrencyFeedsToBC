@@ -8,6 +8,4 @@ tableextension 73400 "O4N Curr. Exch. Rate Serv. Ext" extends "Curr. Exch. Rate 
             DataClassification = SystemMetadata;
         }
     }
-
-
 }

@@ -1,14 +1,14 @@
 table 73401 "O4N Currency Buffer"
 {
-    TableType = Temporary;
+    Caption = 'O4N Currency Buffer';
     DataClassification = SystemMetadata;
-
+    TableType = Temporary;
     fields
     {
         field(1; Id; Guid)
         {
+            Caption = 'Id';
             DataClassification = SystemMetadata;
-
         }
         field(2; "Temp Blob"; Blob)
         {
@@ -42,20 +42,20 @@ table 73401 "O4N Currency Buffer"
 
     trigger OnModify()
     begin
-
     end;
 
     trigger OnDelete()
     begin
-
     end;
 
     trigger OnRename()
     begin
-
     end;
 
-    /// <summary> 
+    var
+        DefineFiltersTxt: Label 'Specify currency filter for when the exchange rates will be applied.';
+
+    /// <summary>
     /// Get Update ResponseInStream with content from Temp Blob.
     /// </summary>
     /// <param name="ResponseInStream">Parameter of type InStream.</param>
@@ -70,20 +70,6 @@ table 73401 "O4N Currency Buffer"
         Content.WriteFrom(InStr);
         Content.ReadAs(ResponseInStream);
     end;
-
-    procedure ReadAsText(): Text
-    var
-        TypeHelper: Codeunit "Type Helper";
-        InStr: InStream;
-    begin
-        if not "Temp Blob".HasValue() then exit;
-        CalcFields("Temp Blob");
-        "Temp Blob".CreateInStream(InStr);
-        exit(TypeHelper.ReadAsTextWithSeparator(InStr, TypeHelper.NewLine()));
-    end;
-
-    var
-        DefineFiltersTxt: Label 'Specify currency filter for when the exchange rates will be applied.';
 
     procedure GetFiltersAsTextDisplay(var CurrExchRateUpdServ: Record "Curr. Exch. Rate Update Setup"): Text
     var
@@ -102,17 +88,40 @@ table 73401 "O4N Currency Buffer"
         exit('');
     end;
 
+    procedure ReadAsText(): Text
+    var
+        TypeHelper: Codeunit "Type Helper";
+        InStr: InStream;
+    begin
+        if not "Temp Blob".HasValue() then exit;
+        CalcFields("Temp Blob");
+        "Temp Blob".CreateInStream(InStr);
+        exit(TypeHelper.ReadAsTextWithSeparator(InStr, TypeHelper.NewLine()));
+    end;
+
     procedure SetSelectionFilter(var CurrExchRateUpdServ: Record "Curr. Exch. Rate Update Setup")
     var
+        FiltersOutStream: OutStream;
         CurrentFilters: Text;
         NewFilters: Text;
-        FiltersOutStream: OutStream;
     begin
         CurrentFilters := GetExistingFilters(CurrExchRateUpdServ);
         if not ShowRequestPageAndGetFilters(NewFilters, CurrentFilters, '', Database::Currency, DefineFiltersTxt) then exit;
         Clear(CurrExchRateUpdServ."O4N Currency Filter");
         CurrExchRateUpdServ."O4N Currency Filter".CreateOutStream(FiltersOutStream);
         FiltersOutStream.WriteText(NewFilters);
+    end;
+
+    local procedure GetExistingFilters(var CurrExchRateUpdServ: Record "Curr. Exch. Rate Update Setup") Filters: Text
+    var
+        FiltersInStream: InStream;
+    begin
+        CurrExchRateUpdServ.CalcFields("O4N Currency Filter");
+        if not CurrExchRateUpdServ."O4N Currency Filter".HasValue then
+            exit;
+
+        CurrExchRateUpdServ."O4N Currency Filter".CreateInStream(FiltersInStream);
+        FiltersInStream.Read(Filters);
     end;
 
     local procedure ShowRequestPageAndGetFilters(var NewFilters: Text; ExistingFilters: Text; EntityName: Code[20]; TableNum: Integer; PageCaption: Text) FiltersSet: Boolean
@@ -138,17 +147,4 @@ table 73401 "O4N Currency Buffer"
 
         FiltersSet := true;
     end;
-
-    local procedure GetExistingFilters(var CurrExchRateUpdServ: Record "Curr. Exch. Rate Update Setup") Filters: Text
-    var
-        FiltersInStream: InStream;
-    begin
-        CurrExchRateUpdServ.CalcFields("O4N Currency Filter");
-        if not CurrExchRateUpdServ."O4N Currency Filter".HasValue then
-            exit;
-
-        CurrExchRateUpdServ."O4N Currency Filter".CreateInStream(FiltersInStream);
-        FiltersInStream.Read(Filters);
-    end;
-
 }

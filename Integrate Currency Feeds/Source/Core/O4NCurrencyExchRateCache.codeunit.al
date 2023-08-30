@@ -4,14 +4,32 @@ codeunit 73401 "O4N Currency Exch. Rate Cache"
         CacheErr: Label 'Unable to use D365 Connect Cache Service.  Please try again in a moment.';
 
     [NonDebuggable]
+    procedure IsInCache(CacheUrl: Text[250]) InCache: Boolean
+    var
+        RequestMgt: Codeunit "Http Web Request Mgt.";
+        IsHandled: Boolean;
+        Client: HttpClient;
+        Response: HttpResponseMessage;
+    begin
+        OnBeforeIsInCache(CacheUrl, InCache, IsHandled);
+        if IsHandled then
+            exit;
+
+        if CacheUrl = '' then exit(false);
+        if not RequestMgt.CheckUrl(CacheUrl) then exit(false);
+        if not Client.Get(CacheUrl, Response) then exit(false);
+        exit(Response.IsSuccessStatusCode());
+    end;
+
+    [NonDebuggable]
     procedure StoreInCache(var TempBuffer: Record "O4N Currency Buffer") CacheUrl: Text[250]
     var
-        CacheServiceUrlTok: Label 'CurrencyCacheServiceUrl', Locked = true;
         IsHandled: Boolean;
-        JObject: JsonObject;
         Client: HttpClient;
         Request: HttpRequestMessage;
         Response: HttpResponseMessage;
+        JObject: JsonObject;
+        CacheServiceUrlTok: Label 'CurrencyCacheServiceUrl', Locked = true;
         Content, Url : Text;
     begin
         OnBeforeStoreInCache(TempBuffer, CacheUrl, IsHandled);
@@ -36,24 +54,6 @@ codeunit 73401 "O4N Currency Exch. Rate Cache"
     end;
 
     [NonDebuggable]
-    procedure IsInCache(CacheUrl: Text[250]) InCache: Boolean
-    var
-        RequestMgt: Codeunit "Http Web Request Mgt.";
-        IsHandled: Boolean;
-        Client: HttpClient;
-        Response: HttpResponseMessage;
-    begin
-        OnBeforeIsInCache(CacheUrl, InCache, IsHandled);
-        if IsHandled then
-            exit;
-
-        if CacheUrl = '' then exit(false);
-        if not RequestMgt.CheckUrl(CacheUrl) then exit(false);
-        if not Client.Get(CacheUrl, Response) then exit(false);
-        exit(Response.IsSuccessStatusCode());
-    end;
-
-    [NonDebuggable]
     procedure TryGetSecret(SecretName: Text; var SecretValue: Text)
     var
         Setup: Record "O4N Connect Exch. Rate Setup";
@@ -72,7 +72,7 @@ codeunit 73401 "O4N Currency Exch. Rate Cache"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeTryGetSecret(SecretName: Text; var SecretValue: Text; var IsHandled: Boolean)
+    local procedure OnBeforeIsInCache(CacheUrl: Text[250]; var InCache: Boolean; var IsHandled: Boolean)
     begin
     end;
 
@@ -82,9 +82,7 @@ codeunit 73401 "O4N Currency Exch. Rate Cache"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeIsInCache(CacheUrl: Text[250]; var InCache: Boolean; var IsHandled: Boolean)
+    local procedure OnBeforeTryGetSecret(SecretName: Text; var SecretValue: Text; var IsHandled: Boolean)
     begin
     end;
-
-
 }

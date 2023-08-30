@@ -10,8 +10,8 @@ codeunit 73409 "O4N Currency Overwrite Mgt."
 
     local procedure ApplyOverwritePolicy(var TempCurrencyExchangeRate: Record "Currency Exchange Rate")
     var
-        Setup: Record "O4N Connect Exch. Rate Setup";
         CurrencyExchangeRate: Record "Currency Exchange Rate";
+        Setup: Record "O4N Connect Exch. Rate Setup";
     begin
         if not Setup.Get() then Setup.Init();
 
@@ -28,5 +28,4 @@ codeunit 73409 "O4N Currency Overwrite Mgt."
                             TempCurrencyExchangeRate.Delete();
             until TempCurrencyExchangeRate.Next() = 0;
     end;
-
 }

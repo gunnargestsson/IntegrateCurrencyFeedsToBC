@@ -44,7 +44,7 @@
   ],
   "screenshots": [],
   "platform": "1.0.0.0",
-  "application": "21.0.0.0",
+  "application": "22.0.0.0",
   "idRanges": [
     {
       "from": 93550,
@@ -55,5 +55,6 @@
     "allowDebugging": true,
     "allowDownloadingSource": false,
     "includeSourceInSymbolFile": false
-  }
+  },
+  "suppressWarnings": ["AA0072"]
 }

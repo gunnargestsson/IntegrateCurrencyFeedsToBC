@@ -2,14 +2,13 @@ codeunit 73407 "O4N Currency ISO Mgt"
 {
     trigger OnRun()
     begin
-
     end;
 
     var
         TempCurrency: Record Currency temporary;
+        NoUniversalCurrencyTok: Label 'No universal currency', Locked = true, MaxLength = 30;
         TemporaryErr: Label 'The record must be temporary.';
         XmlErr: Label 'Unable to read currencies from the xml.';
-        NoUniversalCurrencyTok: Label 'No universal currency', Locked = true, MaxLength = 30;
 
     procedure GetISOList(var Currency: Record Currency)
     begin
@@ -51,11 +50,42 @@ codeunit 73407 "O4N Currency ISO Mgt"
         end
     end;
 
+    local procedure DownloadXml() Doc: XmlDocument
+    var
+        TempBlob: Codeunit "Temp Blob";
+        Client: HttpClient;
+        Response: HttpResponseMessage;
+        InStr: InStream;
+    begin
+        TempBlob.CreateInStream(InStr);
+        Client.Get('https://www.six-group.com/dam/download/financial-information/data-center/iso-currrency/lists/list-one.xml', Response);
+        Response.Content.ReadAs(InStr);
+        XmlDocument.ReadFrom(InStr, Doc);
+    end;
+
+    local procedure GetNodeInt(SourceNode: XmlNode; NodeName: Text) NodeValue: Integer
+    var
+        NodeValueAsText: Text;
+    begin
+        NodeValueAsText := GetNodeText(SourceNode, NodeName);
+        if not Evaluate(NodeValue, NodeValueAsText, 9) then
+            NodeValue := 0;
+    end;
+
+    local procedure GetNodeText(SourceNode: XmlNode; NodeName: Text) NodeValue: Text
+    var
+        ValueNode: XmlNode;
+    begin
+        if not SourceNode.SelectSingleNode(NodeName, ValueNode) then
+            Error(XmlErr);
+        NodeValue := ValueNode.AsXmlElement().InnerText();
+    end;
+
     local procedure LoadISOList()
     var
         Doc: XmlDocument;
-        CcyNtries: XmlNodeList;
         CcyNtry: XmlNode;
+        CcyNtries: XmlNodeList;
     begin
         TempCurrency.Reset();
         if not TempCurrency.IsEmpty() then
@@ -80,36 +110,5 @@ codeunit 73407 "O4N Currency ISO Mgt"
                     end;
                     TempCurrency.Insert();
                 end;
-    end;
-
-    local procedure DownloadXml() Doc: XmlDocument
-    var
-        TempBlob: Codeunit "Temp Blob";
-        Client: HttpClient;
-        Response: HttpResponseMessage;
-        InStr: Instream;
-    begin
-        TempBlob.CreateInStream(InStr);
-        Client.Get('https://www.six-group.com/dam/download/financial-information/data-center/iso-currrency/lists/list-one.xml', Response);
-        Response.Content.ReadAs(InStr);
-        XmlDocument.ReadFrom(InStr, Doc);
-    end;
-
-    local procedure GetNodeText(SourceNode: XmlNode; NodeName: Text) NodeValue: Text
-    var
-        ValueNode: XmlNode;
-    begin
-        if not SourceNode.SelectSingleNode(NodeName, ValueNode) then
-            Error(XmlErr);
-        NodeValue := ValueNode.AsXmlElement().InnerText();
-    end;
-
-    local procedure GetNodeInt(SourceNode: XmlNode; NodeName: Text) NodeValue: Integer
-    var
-        NodeValueAsText: Text;
-    begin
-        NodeValueAsText := GetNodeText(SourceNode, NodeName);
-        if not Evaluate(NodeValue, NodeValueAsText, 9) then
-            NodeValue := 0;
     end;
 }

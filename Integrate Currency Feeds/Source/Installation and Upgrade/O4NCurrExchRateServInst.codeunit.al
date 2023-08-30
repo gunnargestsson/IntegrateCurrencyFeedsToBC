@@ -8,5 +8,4 @@ codeunit 73410 "O4N Curr. Exch. Rate Serv Inst"
     begin
         CurrencyExchangeRateService.DiscoverCurrencyMappingCodeunits();
     end;
-
 }

@@ -29,19 +29,9 @@ codeunit 73402 "O4N Currency Conversion"
                 CurrencyExchangeRate.SetRange("Currency Code", LCYCurrencyCode);
                 CurrencyExchangeRate.FindLast();
                 CurrencyExchangeRate.SetRange("Starting Date");
-
             until CurrencyExchangeRate.Next() = 0;
 
         CurrencyExchangeRate.Copy(TempCurrencyExchangeRate, true);
-    end;
-
-    local procedure InsertMirrorEntry(var CurrencyExchangeRate: Record "Currency Exchange Rate"; CurrencyCode: Code[10]; var TempCurrencyExchangeRate: Record "Currency Exchange Rate")
-    begin
-        TempCurrencyExchangeRate := CurrencyExchangeRate;
-        TempCurrencyExchangeRate."Currency Code" := CurrencyCode;
-        TempCurrencyExchangeRate."Exchange Rate Amount" := CurrencyExchangeRate."Relational Exch. Rate Amount" * 100;
-        TempCurrencyExchangeRate."Relational Exch. Rate Amount" := CurrencyExchangeRate."Exchange Rate Amount" * 100;
-        TempCurrencyExchangeRate.Insert();
     end;
 
     local procedure InsertConvertedEntry(var CurrencyExchangeRate: Record "Currency Exchange Rate"; CurrencyFactor: Decimal; var TempCurrencyExchangeRate: Record "Currency Exchange Rate")
@@ -55,4 +45,12 @@ codeunit 73402 "O4N Currency Conversion"
         TempCurrencyExchangeRate.Insert();
     end;
 
+    local procedure InsertMirrorEntry(var CurrencyExchangeRate: Record "Currency Exchange Rate"; CurrencyCode: Code[10]; var TempCurrencyExchangeRate: Record "Currency Exchange Rate")
+    begin
+        TempCurrencyExchangeRate := CurrencyExchangeRate;
+        TempCurrencyExchangeRate."Currency Code" := CurrencyCode;
+        TempCurrencyExchangeRate."Exchange Rate Amount" := CurrencyExchangeRate."Relational Exch. Rate Amount" * 100;
+        TempCurrencyExchangeRate."Relational Exch. Rate Amount" := CurrencyExchangeRate."Exchange Rate Amount" * 100;
+        TempCurrencyExchangeRate.Insert();
+    end;
 }

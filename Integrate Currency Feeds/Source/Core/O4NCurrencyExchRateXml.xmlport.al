@@ -4,8 +4,8 @@ xmlport 73400 "O4N Currency Exch. Rate Xml"
     Direction = Export;
     Encoding = UTF8;
     Format = Xml;
-    PreserveWhiteSpace = true;
     FormatEvaluate = Xml;
+    PreserveWhiteSpace = true;
 
     schema
     {
@@ -30,7 +30,7 @@ xmlport 73400 "O4N Currency Exch. Rate Xml"
         }
     }
 
-    /// <summary> 
+    /// <summary>
     /// Set the currency exchange rate temporary data for the XmlPort
     /// </summary>
     /// <param name="CurrencyExchangeRate">Temporary instance of type Record "Currency Exchange Rate".</param>

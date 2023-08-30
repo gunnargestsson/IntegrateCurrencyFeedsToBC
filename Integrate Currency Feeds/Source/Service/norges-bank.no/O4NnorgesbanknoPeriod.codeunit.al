@@ -5,17 +5,17 @@ codeunit 73429 "O4N norges-bank.no Period"
 
     trigger OnRun()
     var
-        GLSetup: Record "General Ledger Setup";
         TempCurrencyExchangeRate: Record "Currency Exchange Rate" temporary;
+        GLSetup: Record "General Ledger Setup";
         CurrencyConvertion: Codeunit "O4N Currency Conversion";
-        CurrencyFilter: Codeunit "O4N Currency Filter Mgt.";
         DateMgt: Codeunit "O4N Currency Date Mgt.";
+        CurrencyFilter: Codeunit "O4N Currency Filter Mgt.";
+        BaseCurrencyCode: Code[10];
+        EndDate: Date;
+        StartDate: Date;
         JObject: JsonObject;
         OutStr: OutStream;
         ToCurrencyCodeList: Text;
-        BaseCurrencyCode: Code[10];
-        StartDate: Date;
-        EndDate: Date;
     begin
         GLSetup.Get();
         GLSetup.TestField("LCY Code");
@@ -34,44 +34,31 @@ codeunit 73429 "O4N norges-bank.no Period"
         Rec.Modify();
     end;
 
-    local procedure DownloadJson(Url: Text; var ResponseJson: JsonObject)
     var
-        RequestErr: Label 'Error Code: %1\%2', Comment = '%1 = Response Error Code, %2 = Response Error Phrase';
-        Client: HttpClient;
-        Request: HttpRequestMessage;
-        Response: HttpResponseMessage;
-        InStr: InStream;
-        IsHandled: Boolean;
-    begin
-        Request.SetRequestUri(Url);
-        Request.Method('GET');
-        CurrHelper.OnBeforeClientSend(UrlTok, Request, Response, IsHandled);
-        if not IsHandled then
-            Client.Send(Request, Response);
-        HttpHelper.ThrowError(Response);
-        HttpHelper.CreateInStream(InStr);
-        Response.Content.ReadAs(InStr);
-        HttpHelper.ReadInStr(InStr, ResponseJson);
-        if not Response.IsSuccessStatusCode then
-            Error(RequestErr, Response.HttpStatusCode, Response.ReasonPhrase);
-    end;
+        HttpHelper: Codeunit "O4N Curr. Exch. Rate Http";
+        CurrHelper: Codeunit "O4N Curr. Exch. Rates Helper";
+        DescTok: Label 'Downloads missing exchange rates', MaxLength = 100;
+        DownloadUrlTok: Label 'https://data.norges-bank.no/api/data/EXR/B..NOK.SP?startPeriod=%1&endPeriod=%2&format=sdmx-json&locale=en', Locked = true;
+        ServiceProviderTok: Label 'https://www.norges-bank.no/en/topics/Statistics/exchange_rates', MaxLength = 250, Locked = true;
+        UnableToReadBaseCurrencyFromJsonErr: Label 'Unable to read base currency from Json';
+        UrlTok: Label 'https://D365Connect.com/NOK/norges-bank.no/period', Locked = true, MaxLength = 250;
 
     procedure ReadJson(var JObject: JsonObject; var TempCurrencyExchangeRate: Record "Currency Exchange Rate") BaseCurrencyCode: Code[10];
     var
-        TempBuffer: Record "Name/Value Buffer" temporary;
         TempDate: Record "Date" temporary;
-        TempMultiplier: Record "Integer" temporary;
         TempDecimals: Record "Integer" temporary;
-        JToken: JsonToken;
+        TempMultiplier: Record "Integer" temporary;
+        TempBuffer: Record "Name/Value Buffer" temporary;
+        AttributeNo: Integer;
         JCurrencyCode: JsonToken;
         JCurrencyName: JsonToken;
-        JCurrencyValue: JsonToken;
         JCurrencySeries: JsonToken;
-        JDecimals: JsonValue;
+        JCurrencyValue: JsonToken;
+        JToken: JsonToken;
         JCalculated: JsonValue;
         JCollectionIndicator: JsonValue;
+        JDecimals: JsonValue;
         SeriesId: Text;
-        AttributeNo: Integer;
     begin
         if not JObject.SelectToken('data.structure.dimensions.series[?(@.id==''QUOTE_CUR'')].values[0].id', JToken) then
             Error(UnableToReadBaseCurrencyFromJsonErr);
@@ -151,15 +138,7 @@ codeunit 73429 "O4N norges-bank.no Period"
         CurrHelper.OnAfterReadJson(UrlTok, JObject, TempCurrencyExchangeRate);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"O4N Curr. Exch. Rate Service", 'DiscoverCurrencyMappingCodeunits', '', false, false)]
-    local procedure DiscoverCurrencyMappingCodeunits()
-    var
-        CurrencyExchangeRateService: Record "O4N Curr. Exch. Rate Service";
-    begin
-        RegisterService(CurrencyExchangeRateService);
-    end;
-
-    /// <summary> 
+    /// <summary>
     /// Register this Connected Exchange Rate Service method into the Connected Exchange Rate Service method list.
     /// </summary>
     procedure RegisterService(var CurrencyExchangeRateService: Record "O4N Curr. Exch. Rate Service")
@@ -174,12 +153,33 @@ codeunit 73429 "O4N norges-bank.no Period"
         CurrencyExchangeRateService.Insert(true);
     end;
 
+    local procedure DownloadJson(Url: Text; var ResponseJson: JsonObject)
     var
-        HttpHelper: Codeunit "O4N Curr. Exch. Rate Http";
-        CurrHelper: Codeunit "O4N Curr. Exch. Rates Helper";
-        UrlTok: label 'https://D365Connect.com/NOK/norges-bank.no/period', Locked = true, MaxLength = 250;
-        DescTok: Label 'Downloads missing exchange rates', MaxLength = 100;
-        ServiceProviderTok: Label 'https://www.norges-bank.no/en/topics/Statistics/exchange_rates', MaxLength = 250, Locked = true;
-        DownloadUrlTok: Label 'https://data.norges-bank.no/api/data/EXR/B..NOK.SP?startPeriod=%1&endPeriod=%2&format=sdmx-json&locale=en', Locked = true;
-        UnableToReadBaseCurrencyFromJsonErr: Label 'Unable to read base currency from Json';
+        IsHandled: Boolean;
+        Client: HttpClient;
+        Request: HttpRequestMessage;
+        Response: HttpResponseMessage;
+        InStr: InStream;
+        RequestErr: Label 'Error Code: %1\%2', Comment = '%1 = Response Error Code, %2 = Response Error Phrase';
+    begin
+        Request.SetRequestUri(Url);
+        Request.Method('GET');
+        CurrHelper.OnBeforeClientSend(UrlTok, Request, Response, IsHandled);
+        if not IsHandled then
+            Client.Send(Request, Response);
+        HttpHelper.ThrowError(Response);
+        HttpHelper.CreateInStream(InStr);
+        Response.Content.ReadAs(InStr);
+        HttpHelper.ReadInStr(InStr, ResponseJson);
+        if not Response.IsSuccessStatusCode then
+            Error(RequestErr, Response.HttpStatusCode, Response.ReasonPhrase);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"O4N Curr. Exch. Rate Service", 'DiscoverCurrencyMappingCodeunits', '', false, false)]
+    local procedure DiscoverCurrencyMappingCodeunits()
+    var
+        CurrencyExchangeRateService: Record "O4N Curr. Exch. Rate Service";
+    begin
+        RegisterService(CurrencyExchangeRateService);
+    end;
 }

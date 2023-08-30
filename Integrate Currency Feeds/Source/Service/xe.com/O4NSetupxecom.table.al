@@ -1,58 +1,58 @@
 table 73424 "O4N Setup xe.com"
 {
+    Caption = 'O4N Setup xe.com';
     DataClassification = SystemMetadata;
-
     fields
     {
         field(1; "Primary Key"; Code[10])
         {
-            DataClassification = SystemMetadata;
             Caption = 'Primary Key';
+            DataClassification = SystemMetadata;
         }
         field(2; "Account ID Storage Key"; Guid)
         {
-            DataClassification = SystemMetadata;
             Caption = 'Account ID Key';
+            DataClassification = SystemMetadata;
         }
         field(3; "Account API Key Storage Key"; Guid)
         {
-            DataClassification = SystemMetadata;
             Caption = 'Account API Key Storage Key';
+            DataClassification = SystemMetadata;
         }
         field(4; "Subscription Id"; Guid)
         {
-            DataClassification = SystemMetadata;
             Caption = 'Subscription Id';
-        }
-        field(5; "Organization"; Text[250])
-        {
             DataClassification = SystemMetadata;
+        }
+        field(5; Organization; Text[250])
+        {
             Caption = 'Organization';
-        }
-        field(6; "Package"; Code[50])
-        {
             DataClassification = SystemMetadata;
+        }
+        field(6; Package; Code[50])
+        {
             Caption = 'Package';
+            DataClassification = SystemMetadata;
         }
         field(7; "Subscription Start Time"; DateTime)
         {
-            DataClassification = SystemMetadata;
             Caption = 'Subscription Start Time';
+            DataClassification = SystemMetadata;
         }
         field(8; "Subscription End Time"; DateTime)
         {
-            DataClassification = SystemMetadata;
             Caption = 'Subscription End Time';
+            DataClassification = SystemMetadata;
         }
         field(9; "Package Limit"; Integer)
         {
-            DataClassification = SystemMetadata;
             Caption = 'Package Limit';
+            DataClassification = SystemMetadata;
         }
         field(10; "Package Limit Remaining"; Integer)
         {
-            DataClassification = SystemMetadata;
             Caption = 'Package Limit Remaining';
+            DataClassification = SystemMetadata;
         }
     }
 
@@ -66,23 +66,23 @@ table 73424 "O4N Setup xe.com"
 
     trigger OnInsert()
     begin
-
     end;
 
     trigger OnModify()
     begin
-
     end;
 
     trigger OnDelete()
     begin
-
     end;
 
     trigger OnRename()
     begin
-
     end;
+
+    var
+        SecretService: Codeunit "O4N Curr. Exch. Rate Secret";
+        AuthorizationMissingErr: Label 'Account ID and Account API Key is missing in %1', Comment = '%1 = tablecaption';
 
     procedure GetAccountInfo()
     var
@@ -111,17 +111,11 @@ table 73424 "O4N Setup xe.com"
         end;
     end;
 
-    procedure VerifyAuthorization()
-    begin
-        if SecretService.HasSecret("Account ID Storage Key") and SecretService.HasSecret("Account API Key Storage Key") then exit;
-        Error(AuthorizationMissingErr, TableCaption());
-    end;
-
     procedure GetBasicAuthorization(): Text
     var
         Base64Convert: Codeunit "Base64 Convert";
-        UserAuthenticationTok: Label '%1:%2', Locked = true;
         BasicTok: Label 'Basic ', Locked = true;
+        UserAuthenticationTok: Label '%1:%2', Locked = true;
     begin
         exit(
             BasicTok +
@@ -130,6 +124,12 @@ table 73424 "O4N Setup xe.com"
                     StrSubstNo(UserAuthenticationTok,
                     SecretService.GetSecret("Account ID Storage Key"),
                     SecretService.GetSecret("Account API Key Storage Key")))));
+    end;
+
+    procedure VerifyAuthorization()
+    begin
+        if SecretService.HasSecret("Account ID Storage Key") and SecretService.HasSecret("Account API Key Storage Key") then exit;
+        Error(AuthorizationMissingErr, TableCaption());
     end;
 
     local procedure ReadAccountInfo(JSON: Text)
@@ -163,9 +163,4 @@ table 73424 "O4N Setup xe.com"
         if JObject.Get('message', JToken) then
             Error(JToken.AsValue().AsText());
     end;
-
-    var
-        SecretService: Codeunit "O4N Curr. Exch. Rate Secret";
-        AuthorizationMissingErr: Label 'Account ID and Account API Key is missing in %1', Comment = '%1 = tablecaption';
-
 }

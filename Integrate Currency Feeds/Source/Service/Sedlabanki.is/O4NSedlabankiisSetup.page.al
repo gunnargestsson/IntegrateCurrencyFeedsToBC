@@ -1,17 +1,17 @@
 page 73421 "O4N Sedlabanki.is Setup"
 {
     Caption = 'Sedlabanki.is Setup';
+    DeleteAllowed = false;
+    InsertAllowed = false;
+    ModifyAllowed = true;
     PageType = Card;
+    ShowFilter = false;
     SourceTable = "O4N Sedlabanki.is Setup";
     UsageCategory = None;
-    InsertAllowed = false;
-    DeleteAllowed = false;
-    ModifyAllowed = true;
-    ShowFilter = false;
 
     layout
     {
-        area(content)
+        area(Content)
         {
             group(General)
             {
@@ -24,7 +24,6 @@ page 73421 "O4N Sedlabanki.is Setup"
             }
         }
     }
-
 
     trigger OnOpenPage()
     begin

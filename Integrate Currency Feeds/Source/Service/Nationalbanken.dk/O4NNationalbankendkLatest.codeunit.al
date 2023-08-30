@@ -4,12 +4,12 @@ codeunit 73422 "O4N Nationalbanken.dk Latest"
 
     trigger OnRun()
     var
-        GLSetup: Record "General Ledger Setup";
         TempCurrencyExchangeRate: Record "Currency Exchange Rate" temporary;
+        GLSetup: Record "General Ledger Setup";
         CurrencyConvertion: Codeunit "O4N Currency Conversion";
         CurrencyFilter: Codeunit "O4N Currency Filter Mgt.";
-        Xml: XmlDocument;
         OutStr: OutStream;
+        Xml: XmlDocument;
     begin
         GLSetup.Get();
         GLSetup.TestField("LCY Code");
@@ -26,34 +26,14 @@ codeunit 73422 "O4N Nationalbanken.dk Latest"
         Rec.Modify();
     end;
 
-    /// <summary> 
-    /// Description for DownloadXml.
-    /// </summary>
-    /// <param name="ResponseXml">Parameter of type XmlDocument.</param>
-    /// <returns>Return variable "Boolean".</returns>
-    local procedure DownloadXml(var ResponseXml: XmlDocument)
     var
-        Client: HttpClient;
-        Request: HttpRequestMessage;
-        Response: HttpResponseMessage;
-        RequestErr: Label 'Error Code: %1\%2', Comment = '%1 = Response Error Code, %2 = Response Error Phrase';
-        InStr: InStream;
-        IsHandled: Boolean;
-    begin
-        Request.SetRequestUri('https://www.nationalbanken.dk/_vti_bin/DN/DataService.svc/CurrencyRatesXML?lang=en');
-        Request.Method('GET');
-        CurrHelper.OnBeforeClientSend(UrlTok, Request, Response, IsHandled);
-        if not IsHandled then
-            Client.Send(Request, Response);
-        HttpHelper.ThrowError(Response);
-        HttpHelper.CreateInStream(InStr);
-        Response.Content.ReadAs(InStr);
-        HttpHelper.ReadInStr(InStr, ResponseXml);
-        if not Response.IsSuccessStatusCode then
-            Error(RequestErr, Response.HttpStatusCode, Response.ReasonPhrase);
-    end;
+        HttpHelper: Codeunit "O4N Curr. Exch. Rate Http";
+        CurrHelper: Codeunit "O4N Curr. Exch. Rates Helper";
+        DescTok: Label 'Downloads the latest exchange rates', Comment = '%1 = Web Service Url', MaxLength = 100;
+        ServiceProviderTok: Label 'https://www.nationalbanken.dk/en/statistics/exchange_rates/Pages/default.aspx', MaxLength = 250, Locked = true;
+        UrlTok: Label 'https://D365Connect.com/DKK/nationalbanken.dk/latest', Locked = true, MaxLength = 250;
 
-    /// <summary> 
+    /// <summary>
     /// Description for D365 ConnectXml.
     /// </summary>
     /// <param name="Xml">Parameter of type XmlDocument.</param>
@@ -61,10 +41,10 @@ codeunit 73422 "O4N Nationalbanken.dk Latest"
     procedure ReadXml(var Xml: XmlDocument; var TempCurrencyExchangeRate: Record "Currency Exchange Rate")
     var
 
-        Currencies: XmlNodeList;
+        Attribute: XmlAttribute;
         Currency: XmlNode;
         Node: XmlNode;
-        Attribute: XmlAttribute;
+        Currencies: XmlNodeList;
     begin
         if not Xml.SelectSingleNode('//*[local-name()="dailyrates"]', Node) then exit;
         if not Xml.SelectNodes('//*[local-name()="currency"]', Currencies) then exit;
@@ -87,15 +67,7 @@ codeunit 73422 "O4N Nationalbanken.dk Latest"
         CurrHelper.OnAfterReadXml(UrlTok, Xml, TempCurrencyExchangeRate);
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"O4N Curr. Exch. Rate Service", 'DiscoverCurrencyMappingCodeunits', '', false, false)]
-    local procedure DiscoverCurrencyMappingCodeunits()
-    var
-        CurrencyExchangeRateService: Record "O4N Curr. Exch. Rate Service";
-    begin
-        RegisterService(CurrencyExchangeRateService);
-    end;
-
-    /// <summary> 
+    /// <summary>
     /// Register this Connected Exchange Rate Service method into the Connected Exchange Rate Service method list.
     /// </summary>
     procedure RegisterService(var CurrencyExchangeRateService: Record "O4N Curr. Exch. Rate Service")
@@ -110,10 +82,38 @@ codeunit 73422 "O4N Nationalbanken.dk Latest"
         CurrencyExchangeRateService.Insert(true);
     end;
 
+    /// <summary>
+    /// Description for DownloadXml.
+    /// </summary>
+    /// <param name="ResponseXml">Parameter of type XmlDocument.</param>
+    /// <returns>Return variable "Boolean".</returns>
+    local procedure DownloadXml(var ResponseXml: XmlDocument)
     var
-        HttpHelper: Codeunit "O4N Curr. Exch. Rate Http";
-        CurrHelper: Codeunit "O4N Curr. Exch. Rates Helper";
-        UrlTok: label 'https://D365Connect.com/DKK/nationalbanken.dk/latest', Locked = true, MaxLength = 250;
-        DescTok: Label 'Downloads the latest exchange rates', Comment = '%1 = Web Service Url', MaxLength = 100;
-        ServiceProviderTok: Label 'https://www.nationalbanken.dk/en/statistics/exchange_rates/Pages/default.aspx', MaxLength = 250, Locked = true;
+        IsHandled: Boolean;
+        Client: HttpClient;
+        Request: HttpRequestMessage;
+        Response: HttpResponseMessage;
+        InStr: InStream;
+        RequestErr: Label 'Error Code: %1\%2', Comment = '%1 = Response Error Code, %2 = Response Error Phrase';
+    begin
+        Request.SetRequestUri('https://www.nationalbanken.dk/_vti_bin/DN/DataService.svc/CurrencyRatesXML?lang=en');
+        Request.Method('GET');
+        CurrHelper.OnBeforeClientSend(UrlTok, Request, Response, IsHandled);
+        if not IsHandled then
+            Client.Send(Request, Response);
+        HttpHelper.ThrowError(Response);
+        HttpHelper.CreateInStream(InStr);
+        Response.Content.ReadAs(InStr);
+        HttpHelper.ReadInStr(InStr, ResponseXml);
+        if not Response.IsSuccessStatusCode then
+            Error(RequestErr, Response.HttpStatusCode, Response.ReasonPhrase);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"O4N Curr. Exch. Rate Service", 'DiscoverCurrencyMappingCodeunits', '', false, false)]
+    local procedure DiscoverCurrencyMappingCodeunits()
+    var
+        CurrencyExchangeRateService: Record "O4N Curr. Exch. Rate Service";
+    begin
+        RegisterService(CurrencyExchangeRateService);
+    end;
 }

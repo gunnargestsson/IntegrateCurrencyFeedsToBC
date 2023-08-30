@@ -1,7 +1,7 @@
 table 73421 "O4N Sedlabanki.is Setup"
 {
+    Caption = 'O4N Sedlabanki.is Setup';
     DataClassification = SystemMetadata;
-
     fields
     {
         field(1; "Primary Key"; Code[10])
@@ -26,22 +26,17 @@ table 73421 "O4N Sedlabanki.is Setup"
 
     trigger OnInsert()
     begin
-
     end;
 
     trigger OnModify()
     begin
-
     end;
 
     trigger OnDelete()
     begin
-
     end;
 
     trigger OnRename()
     begin
-
     end;
-
 }

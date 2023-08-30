@@ -1,16 +1,15 @@
 page 73400 "O4N Curr. Exch. Rate Services"
 {
-
     ApplicationArea = All;
     Caption = 'Connected Exch. Rate Services';
-    PageType = List;
     Editable = false;
+    PageType = List;
     SourceTable = "O4N Curr. Exch. Rate Service";
     UsageCategory = Administration;
 
     layout
     {
-        area(content)
+        area(Content)
         {
             repeater(General)
             {
@@ -24,16 +23,16 @@ page 73400 "O4N Curr. Exch. Rate Services"
                 {
                     ApplicationArea = All;
                     Caption = 'Description';
-                    ToolTip = 'Specifies a description for the Connected Exchange Rate Service functionality.';
                     QuickEntry = false;
+                    ToolTip = 'Specifies a description for the Connected Exchange Rate Service functionality.';
                 }
                 field("Service Provider"; Rec."Service Provider")
                 {
                     ApplicationArea = All;
                     Caption = 'Service Provider';
-                    ToolTip = 'Specifies a service provider Url for the connected exchange rate service.';
                     ExtendedDatatype = URL;
                     QuickEntry = false;
+                    ToolTip = 'Specifies a service provider Url for the connected exchange rate service.';
                 }
                 field("Codeunit Id"; Rec."Codeunit Id")
                 {
@@ -42,7 +41,6 @@ page 73400 "O4N Curr. Exch. Rate Services"
                     ToolTip = 'Specifies the Codeunit Id to be executed for data handling.';
                     Visible = false;
                 }
-
             }
         }
     }
@@ -53,21 +51,21 @@ page 73400 "O4N Curr. Exch. Rate Services"
         {
             action(ConnectSetup)
             {
-                Caption = 'Connect Setup';
                 ApplicationArea = All;
+                Caption = 'Connect Setup';
                 Image = Setup;
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedOnly = true;
+                RunObject = page "O4N Connect Exch. Rate Setup";
                 ToolTip = 'Open SConnect etup for the currency exchange rate services.';
-                RunObject = Page "O4N Connect Exch. Rate Setup";
             }
             action(Setup)
             {
-                Caption = 'Service Setup';
                 ApplicationArea = All;
-                Image = Setup;
+                Caption = 'Service Setup';
                 Enabled = SetupPageEnabled;
+                Image = Setup;
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedOnly = true;
@@ -79,7 +77,6 @@ page 73400 "O4N Curr. Exch. Rate Services"
             }
         }
     }
-
 
     trigger OnOpenPage()
     begin
@@ -93,5 +90,4 @@ page 73400 "O4N Curr. Exch. Rate Services"
 
     var
         SetupPageEnabled: Boolean;
-
 }

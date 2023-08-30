@@ -2,7 +2,6 @@ codeunit 73413 "O4N Currency Filter Mgt."
 {
     trigger OnRun()
     begin
-
     end;
 
     var
@@ -28,7 +27,6 @@ codeunit 73413 "O4N Currency Filter Mgt."
                 TempCurrencyExchangeRates.SetRange("Currency Code");
             until TempCurrencyExchangeRates.Next() = 0;
         end;
-
     end;
 
     local procedure FilterCurrency(CurrencyBuffer: Record "O4N Currency Buffer"; var Currency: Record Currency)

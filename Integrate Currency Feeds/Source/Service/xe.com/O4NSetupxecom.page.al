@@ -1,25 +1,25 @@
 page 73424 "O4N Setup xe.com"
 {
     Caption = 'Setup xe.com';
+    DeleteAllowed = false;
+    InsertAllowed = false;
+    ModifyAllowed = true;
     PageType = Card;
+    ShowFilter = false;
     SourceTable = "O4N Setup xe.com";
     UsageCategory = None;
-    InsertAllowed = false;
-    DeleteAllowed = false;
-    ModifyAllowed = true;
-    ShowFilter = false;
 
     layout
     {
-        area(content)
+        area(Content)
         {
             group(Authentication)
             {
                 Caption = 'Authentication';
                 field("Account ID"; AccountID)
                 {
-                    Caption = 'Account ID';
                     ApplicationArea = All;
+                    Caption = 'Account ID';
                     ToolTip = 'Specifies the Account ID for the service.';
                     trigger OnValidate()
                     begin
@@ -29,10 +29,10 @@ page 73424 "O4N Setup xe.com"
                 }
                 field("Account API Key"; AccountAPIKey)
                 {
-                    Caption = 'Account API Key';
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the value of the Account API Key for the service.';
+                    Caption = 'Account API Key';
                     ExtendedDatatype = Masked;
+                    ToolTip = 'Specifies the value of the Account API Key for the service.';
                     trigger OnValidate()
                     begin
                         SecretService.StoreSecret(Rec."Account API Key Storage Key", AccountAPIKey);
@@ -46,50 +46,50 @@ page 73424 "O4N Setup xe.com"
 
                 field(Organization; Rec.Organization)
                 {
-                    Caption = 'Organization';
                     ApplicationArea = All;
+                    Caption = 'Organization';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Organization field';
                 }
                 field("Subscription Id"; Rec."Subscription Id")
                 {
-                    Caption = 'Subscription Id';
                     ApplicationArea = All;
+                    Caption = 'Subscription Id';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Subscription Id field';
                 }
                 field("Subscription Start Time"; Rec."Subscription Start Time")
                 {
-                    Caption = 'Subscription Start Time';
                     ApplicationArea = All;
+                    Caption = 'Subscription Start Time';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Subscription Start Time field';
                 }
                 field("Subscription End Time"; Rec."Subscription End Time")
                 {
-                    Caption = 'Subscription End Time';
                     ApplicationArea = All;
+                    Caption = 'Subscription End Time';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Subscription End Time field';
                 }
                 field(Package; Rec.Package)
                 {
-                    Caption = 'Package';
                     ApplicationArea = All;
+                    Caption = 'Package';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Package field';
                 }
                 field("Package Limit"; Rec."Package Limit")
                 {
-                    Caption = 'Package Limit';
                     ApplicationArea = All;
+                    Caption = 'Package Limit';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Package Limit field';
                 }
                 field("Package Limit Remaining"; Rec."Package Limit Remaining")
                 {
-                    Caption = 'Package Limit Remaining';
                     ApplicationArea = All;
+                    Caption = 'Package Limit Remaining';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Package Limit Remaining field';
                 }
@@ -99,8 +99,8 @@ page 73424 "O4N Setup xe.com"
 
     var
         SecretService: Codeunit "O4N Curr. Exch. Rate Secret";
-        AccountID: Text;
         AccountAPIKey: Text;
+        AccountID: Text;
 
     trigger OnOpenPage()
     begin
@@ -115,5 +115,4 @@ page 73424 "O4N Setup xe.com"
         AccountID := SecretService.GetSecret(Rec."Account ID Storage Key");
         AccountAPIKey := SecretService.GetSecret(Rec."Account API Key Storage Key");
     end;
-
 }

@@ -1,6 +1,5 @@
 enum 73400 "O4N Currency Overwrite Type"
 {
-
     value(0; None)
     {
         Caption = 'None';
@@ -13,5 +12,4 @@ enum 73400 "O4N Currency Overwrite Type"
     {
         Caption = 'All';
     }
-
 }

@@ -2,53 +2,14 @@ codeunit 73400 "O4N Currency.Exch.Rate Service"
 {
     Permissions = tabledata "O4N Curr. Exch. Rate Service" = m;
 
-    /// <summary> 
-    /// Description for OnAfterGetWebServiceURL.
-    /// </summary>
-    /// <param name="sender">Parameter of type Record "Curr. Exch. Rate Update Setup".</param>
-    /// <param name="ServiceURL">Parameter of type Text.</param>
-    [EventSubscriber(ObjectType::Table, Database::"Curr. Exch. Rate Update Setup", 'OnAfterGetWebServiceURL', '', false, false)]
-    local procedure OnAfterGetWebServiceURL(var sender: Record "Curr. Exch. Rate Update Setup"; var ServiceURL: Text)
+    local procedure CleanUrl(ServiceUrl: Text): Text
     var
-        CurrencyExchangeRateService: Record "O4N Curr. Exch. Rate Service";
+        TypeHelper: Codeunit "Type Helper";
     begin
-        ServiceURL := CleanUrl(ServiceURL);
-        if not CurrencyExchangeRateService.Get(CopyStr(ServiceURL, 1, MaxStrLen(CurrencyExchangeRateService.Url))) then begin
-            VerifyUrl(ServiceURL);
-            exit;
-        end;
-        if not ReUserService(CurrencyExchangeRateService, ServiceURL) then
-            ExecuteService(sender, CurrencyExchangeRateService, ServiceURL);
-        UpdateFieldMapping(sender);
+        exit(DelChr(ServiceUrl, '>', TypeHelper.NewLine()));
     end;
 
-    /// <summary> 
-    /// Description for OnBeforeGetCurrencyExchangeData.
-    /// </summary>
-    /// <param name="CurrExchRateUpdateSetup">Parameter of type Record "Curr. Exch. Rate Update Setup".</param>
-    /// <param name="ResponseInStream">Parameter of type InStream.</param>
-    /// <param name="SourceName">Parameter of type Text.</param>
-    /// <param name="Handled">Parameter of type Boolean.</param>
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Update Currency Exchange Rates", 'OnBeforeGetCurrencyExchangeData', '', false, false)]
-    local procedure OnBeforeGetCurrencyExchangeData(var CurrExchRateUpdateSetup: Record "Curr. Exch. Rate Update Setup"; var ResponseInStream: InStream; var SourceName: Text; var Handled: Boolean)
-    var
-        TempBuffer: Record "O4N Currency Buffer" temporary;
-        CurrencyExchangeRateService: Record "O4N Curr. Exch. Rate Service";
-        ServiceURL: Text;
-    begin
-        ServiceURL := GetWebServiceUrl(CurrExchRateUpdateSetup);
-
-        if not CurrencyExchangeRateService.Get(CopyStr(ServiceURL, 1, MaxStrLen(CurrencyExchangeRateService.Url))) then exit;
-        CurrExchRateUpdateSetup.CalcFields("O4N Currency Filter");
-        TempBuffer."Currency Filter" := CurrExchRateUpdateSetup."O4N Currency Filter";
-        TempBuffer.Insert(true);
-        Codeunit.Run(CurrencyExchangeRateService."Codeunit Id", TempBuffer);
-        TempBuffer.GetContent(ResponseInStream);
-        SourceName := CurrencyExchangeRateService.Description;
-        Handled := true;
-    end;
-
-    /// <summary> 
+    /// <summary>
     /// Description for ExecuteService.
     /// </summary>
     /// <param name="CurrencyExchangeRateService">Parameter of type Record "O4N Curr. Exch. Rate Service".</param>
@@ -73,7 +34,22 @@ codeunit 73400 "O4N Currency.Exch.Rate Service"
         OnAfterExecuteService(CurrencyExchangeRateService, ServiceURL);
     end;
 
-    /// <summary> 
+    /// <summary>
+    /// Description for GetWebServiceUrl.
+    /// </summary>
+    /// <param name="CurrExchRateUpdateSetup">Parameter of type Record "Curr. Exch. Rate Update Setup".</param>
+    local procedure GetWebServiceUrl(CurrExchRateUpdateSetup: Record "Curr. Exch. Rate Update Setup") ServiceURL: Text
+    var
+        InStr: InStream;
+    begin
+        CurrExchRateUpdateSetup.CalcFields("Web Service URL");
+        if CurrExchRateUpdateSetup."Web Service URL".HasValue then begin
+            CurrExchRateUpdateSetup."Web Service URL".CreateInStream(InStr);
+            InStr.Read(ServiceURL);
+        end;
+    end;
+
+    /// <summary>
     /// Description for ReUserService.
     /// </summary>
     /// <param name="CurrencyExchangeRateService">Parameter of type Record "O4N Curr. Exch. Rate Service".</param>
@@ -92,29 +68,14 @@ codeunit 73400 "O4N Currency.Exch.Rate Service"
         exit(true);
     end;
 
-    /// <summary> 
-    /// Description for GetWebServiceUrl.
-    /// </summary>
-    /// <param name="CurrExchRateUpdateSetup">Parameter of type Record "Curr. Exch. Rate Update Setup".</param>
-    local procedure GetWebServiceUrl(CurrExchRateUpdateSetup: Record "Curr. Exch. Rate Update Setup") ServiceURL: Text
-    var
-        InStr: InStream;
-    begin
-        CurrExchRateUpdateSetup.CalcFields("Web Service URL");
-        if CurrExchRateUpdateSetup."Web Service URL".HasValue then begin
-            CurrExchRateUpdateSetup."Web Service URL".CreateInStream(InStr);
-            InStr.Read(ServiceURL);
-        end;
-    end;
-
-    /// <summary> 
+    /// <summary>
     /// Description for UpdateFieldMapping.
     /// </summary>
     /// <param name="CurrExchRateUpdateSetup">Parameter of type Record "Curr. Exch. Rate Update Setup".</param>
     local procedure UpdateFieldMapping(var CurrExchRateUpdateSetup: Record "Curr. Exch. Rate Update Setup")
     var
-        DataExchLineDef: Record "Data Exch. Line Def";
         DataExchColDef: Record "Data Exch. Column Def";
+        DataExchLineDef: Record "Data Exch. Line Def";
     begin
         OnBeforeUpdateFieldMapping(CurrExchRateUpdateSetup);
 
@@ -136,17 +97,10 @@ codeunit 73400 "O4N Currency.Exch.Rate Service"
         OnAfterUpdateFieldMapping(CurrExchRateUpdateSetup);
     end;
 
-    local procedure CleanUrl(ServiceUrl: Text): Text
-    var
-        TypeHelper: Codeunit "Type Helper";
-    begin
-        exit(DelChr(ServiceURL, '>', TypeHelper.NewLine()));
-    end;
-
     local procedure VerifyUrl(var ServiceUrl: Text) Verified: Boolean
     var
-        RequestMgt: Codeunit "Http Web Request Mgt.";
         FileMgt: Codeunit "File Management";
+        RequestMgt: Codeunit "Http Web Request Mgt.";
         Client: HttpClient;
         Response: HttpResponseMessage;
         UnableToVerifyUrlTok: Label 'Unable to verify access to the Url: %1', Comment = '%1 = Service Url';
@@ -162,17 +116,53 @@ codeunit 73400 "O4N Currency.Exch.Rate Service"
         ServiceUrl := '';
     end;
 
-    /// <summary> 
-    /// Description for OnBeforeExecuteService.
+    /// <summary>
+    /// Description for OnAfterGetWebServiceURL.
     /// </summary>
-    /// <param name="CurrencyExchangeRateService">Parameter of type Record "O4N Curr. Exch. Rate Service".</param>
+    /// <param name="sender">Parameter of type Record "Curr. Exch. Rate Update Setup".</param>
     /// <param name="ServiceURL">Parameter of type Text.</param>
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeExecuteService(var CurrencyExchangeRateService: Record "O4N Curr. Exch. Rate Service"; var ServiceURL: Text)
+    [EventSubscriber(ObjectType::Table, Database::"Curr. Exch. Rate Update Setup", 'OnAfterGetWebServiceURL', '', false, false)]
+    local procedure OnAfterGetWebServiceURL(var sender: Record "Curr. Exch. Rate Update Setup"; var ServiceURL: Text)
+    var
+        CurrencyExchangeRateService: Record "O4N Curr. Exch. Rate Service";
     begin
+        ServiceURL := CleanUrl(ServiceURL);
+        if not CurrencyExchangeRateService.Get(CopyStr(ServiceURL, 1, MaxStrLen(CurrencyExchangeRateService.Url))) then begin
+            VerifyUrl(ServiceURL);
+            exit;
+        end;
+        if not ReUserService(CurrencyExchangeRateService, ServiceURL) then
+            ExecuteService(sender, CurrencyExchangeRateService, ServiceURL);
+        UpdateFieldMapping(sender);
     end;
 
-    /// <summary> 
+    /// <summary>
+    /// Description for OnBeforeGetCurrencyExchangeData.
+    /// </summary>
+    /// <param name="CurrExchRateUpdateSetup">Parameter of type Record "Curr. Exch. Rate Update Setup".</param>
+    /// <param name="ResponseInStream">Parameter of type InStream.</param>
+    /// <param name="SourceName">Parameter of type Text.</param>
+    /// <param name="Handled">Parameter of type Boolean.</param>
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Update Currency Exchange Rates", 'OnBeforeGetCurrencyExchangeData', '', false, false)]
+    local procedure OnBeforeGetCurrencyExchangeData(var CurrExchRateUpdateSetup: Record "Curr. Exch. Rate Update Setup"; var ResponseInStream: InStream; var SourceName: Text; var Handled: Boolean)
+    var
+        CurrencyExchangeRateService: Record "O4N Curr. Exch. Rate Service";
+        TempBuffer: Record "O4N Currency Buffer" temporary;
+        ServiceURL: Text;
+    begin
+        ServiceURL := GetWebServiceUrl(CurrExchRateUpdateSetup);
+
+        if not CurrencyExchangeRateService.Get(CopyStr(ServiceURL, 1, MaxStrLen(CurrencyExchangeRateService.Url))) then exit;
+        CurrExchRateUpdateSetup.CalcFields("O4N Currency Filter");
+        TempBuffer."Currency Filter" := CurrExchRateUpdateSetup."O4N Currency Filter";
+        TempBuffer.Insert(true);
+        Codeunit.Run(CurrencyExchangeRateService."Codeunit Id", TempBuffer);
+        TempBuffer.GetContent(ResponseInStream);
+        SourceName := CurrencyExchangeRateService.Description;
+        Handled := true;
+    end;
+
+    /// <summary>
     /// Description for OnAfterExecuteService.
     /// </summary>
     /// <param name="CurrencyExchangeRateService">Parameter of type Record "O4N Curr. Exch. Rate Service".</param>
@@ -182,7 +172,26 @@ codeunit 73400 "O4N Currency.Exch.Rate Service"
     begin
     end;
 
-    /// <summary> 
+    /// <summary>
+    /// Description for OnAfterUpdateFieldMapping.
+    /// </summary>
+    /// <param name="CurrExchRateUpdateSetup">Parameter of type Record "Curr. Exch. Rate Update Setup".</param>
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterUpdateFieldMapping(var CurrExchRateUpdateSetup: Record "Curr. Exch. Rate Update Setup")
+    begin
+    end;
+
+    /// <summary>
+    /// Description for OnBeforeExecuteService.
+    /// </summary>
+    /// <param name="CurrencyExchangeRateService">Parameter of type Record "O4N Curr. Exch. Rate Service".</param>
+    /// <param name="ServiceURL">Parameter of type Text.</param>
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeExecuteService(var CurrencyExchangeRateService: Record "O4N Curr. Exch. Rate Service"; var ServiceURL: Text)
+    begin
+    end;
+
+    /// <summary>
     /// Description for OnBeforeReUserService.
     /// </summary>
     /// <param name="CurrencyExchangeRateService">Parameter of type Record "O4N Curr. Exch. Rate Service".</param>
@@ -194,7 +203,7 @@ codeunit 73400 "O4N Currency.Exch.Rate Service"
     begin
     end;
 
-    /// <summary> 
+    /// <summary>
     /// Description for OnBeforeUpdateFieldMapping.
     /// </summary>
     /// <param name="CurrExchRateUpdateSetup">Parameter of type Record "Curr. Exch. Rate Update Setup".</param>
@@ -202,14 +211,4 @@ codeunit 73400 "O4N Currency.Exch.Rate Service"
     local procedure OnBeforeUpdateFieldMapping(var CurrExchRateUpdateSetup: Record "Curr. Exch. Rate Update Setup")
     begin
     end;
-
-    /// <summary> 
-    /// Description for OnAfterUpdateFieldMapping.
-    /// </summary>
-    /// <param name="CurrExchRateUpdateSetup">Parameter of type Record "Curr. Exch. Rate Update Setup".</param>
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterUpdateFieldMapping(var CurrExchRateUpdateSetup: Record "Curr. Exch. Rate Update Setup")
-    begin
-    end;
-
 }

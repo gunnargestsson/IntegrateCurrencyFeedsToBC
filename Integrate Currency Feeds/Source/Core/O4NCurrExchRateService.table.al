@@ -2,8 +2,8 @@ table 73400 "O4N Curr. Exch. Rate Service"
 {
     Caption = 'Currency Exch. Rate Service';
     DataClassification = SystemMetadata;
-    LookupPageId = "O4N Curr. Exch. Rate Services";
     DrillDownPageId = "O4N Curr. Exch. Rate Services";
+    LookupPageId = "O4N Curr. Exch. Rate Services";
 
     fields
     {
@@ -47,12 +47,11 @@ table 73400 "O4N Curr. Exch. Rate Service"
         }
     }
 
-    /// <summary> 
+    /// <summary>
     /// Description for DiscoverCurrencyMappingCodeunits.
     /// </summary>
     [BusinessEvent(false)]
     procedure DiscoverCurrencyMappingCodeunits()
     begin
     end;
-
 }

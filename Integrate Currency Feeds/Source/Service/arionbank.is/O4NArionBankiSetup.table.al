@@ -7,16 +7,15 @@ table 73403 "O4N Arion Banki Setup"
     {
         field(1; "Primary Key"; Code[10])
         {
-            DataClassification = SystemMetadata;
             Caption = 'Primary Key';
-        }
-        field(2; "Rate Type"; enum "O4N Arion Banki Rate Type")
-        {
             DataClassification = SystemMetadata;
+        }
+        field(2; "Rate Type"; Enum "O4N Arion Banki Rate Type")
+        {
             Caption = 'Rate Type';
+            DataClassification = SystemMetadata;
             InitValue = "SalesPurchaseAverage";
         }
-
     }
     keys
     {

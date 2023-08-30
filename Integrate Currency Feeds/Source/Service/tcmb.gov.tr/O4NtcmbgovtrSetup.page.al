@@ -1,17 +1,17 @@
 page 73428 "O4N tcmb.gov.tr Setup"
 {
     Caption = 'tcmb.gov.tr Setup';
+    DeleteAllowed = false;
+    InsertAllowed = false;
+    ModifyAllowed = true;
     PageType = Card;
+    ShowFilter = false;
     SourceTable = "O4N tcmb.gov.tr Setup";
     UsageCategory = None;
-    InsertAllowed = false;
-    DeleteAllowed = false;
-    ModifyAllowed = true;
-    ShowFilter = false;
 
     layout
     {
-        area(content)
+        area(Content)
         {
             group(General)
             {
@@ -24,7 +24,6 @@ page 73428 "O4N tcmb.gov.tr Setup"
             }
         }
     }
-
 
     trigger OnOpenPage()
     begin

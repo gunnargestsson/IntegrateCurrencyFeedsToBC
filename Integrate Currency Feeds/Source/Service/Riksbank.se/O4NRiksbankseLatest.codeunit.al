@@ -4,12 +4,12 @@ codeunit 73420 "O4N Riksbank.se Latest"
 
     trigger OnRun()
     var
-        GLSetup: Record "General Ledger Setup";
         TempCurrencyExchangeRate: Record "Currency Exchange Rate" temporary;
+        GLSetup: Record "General Ledger Setup";
         CurrencyConvertion: Codeunit "O4N Currency Conversion";
         CurrencyFilter: Codeunit "O4N Currency Filter Mgt.";
-        Xml: XmlDocument;
         OutStr: OutStream;
+        Xml: XmlDocument;
     begin
         GLSetup.Get();
         GLSetup.TestField("LCY Code");
@@ -26,33 +26,114 @@ codeunit 73420 "O4N Riksbank.se Latest"
         Rec.Modify();
     end;
 
-    /// <summary> 
-    /// Description for ThrowIfError.
-    /// </summary>
-    /// <param name="ResponseXml">Parameter of type XmlDocument.</param>
-    local procedure ThrowIfError(var ResponseXml: XmlDocument)
     var
-        SelectedNode: XmlNode;
-        SelectTok: Label '//*[local-name()="%1"]', Locked = true;
+        HttpHelper: Codeunit "O4N Curr. Exch. Rate Http";
+        CurrHelper: Codeunit "O4N Curr. Exch. Rates Helper";
+        DescTok: Label 'Downloads the latest exchange rates', Comment = '%1 = Web Service Url', MaxLength = 100;
+        ServiceProviderTok: Label 'https://www.riksbank.se/en-gb/statistics/search-interest--exchange-rates/web-services/series-for-web-services/', MaxLength = 250, Locked = true;
+        UrlTok: Label 'https://D365Connect.com/SEK/riksbank.se/latest', Locked = true, MaxLength = 250;
+
+    /// <summary>
+    /// Description for CreateRequestXml.
+    /// </summary>
+    /// <param name="Xml">Parameter of type XmlDocument.</param>
+    procedure CreateRequestXml(GLSetup: Record "General Ledger Setup"; var Xml: XmlDocument)
+    var
+        Body: XmlNode;
+        Envelope: XmlNode;
+        getLatestInterestAndExchangeRates: XmlNode;
+        Header: XmlNode;
     begin
-        if not ResponseXml.SelectSingleNode(StrSubstNo(SelectTok, 'Fault'), SelectedNode) then exit;
-        if not ResponseXml.SelectSingleNode(StrSubstNo(SelectTok, 'Text'), SelectedNode) then exit;
-        Error(SelectedNode.AsXmlElement().InnerText);
+        Xml := XmlDocument.Create();
+        Xml.SetDeclaration(XmlDeclaration.Create('1.0', 'utf-8', 'yes'));
+        Envelope := XmlElement.Create('Envelope', 'http://www.w3.org/2003/05/soap-envelope').AsXmlNode();
+        Envelope.AsXmlElement().Add(XmlAttribute.CreateNamespaceDeclaration('soap', 'http://www.w3.org/2003/05/soap-envelope'));
+        Envelope.AsXmlElement().Add(XmlAttribute.CreateNamespaceDeclaration('xsd', 'http://swea.riksbank.se/xsd'));
+        Header := XmlElement.Create('Header', 'http://www.w3.org/2003/05/soap-envelope').AsXmlNode();
+        Envelope.AsXmlElement().Add(Header);
+        Body := XmlElement.Create('Body', 'http://www.w3.org/2003/05/soap-envelope').AsXmlNode();
+        Envelope.AsXmlElement().Add(Body);
+        getLatestInterestAndExchangeRates := XmlElement.Create('getLatestInterestAndExchangeRates', 'http://swea.riksbank.se/xsd').AsXmlNode();
+        Body.AsXmlElement().Add(getLatestInterestAndExchangeRates);
+        getLatestInterestAndExchangeRates.AsXmlElement().Add(XmlElement.Create('languageid', '', 'en').AsXmlNode());
+        GetSeries(GLSetup, getLatestInterestAndExchangeRates);
+        Xml.Add(Envelope);
     end;
 
-    /// <summary> 
+    /// <summary>
+    /// Description for D365 ConnectXml.
+    /// </summary>
+    /// <param name="Xml">Parameter of type XmlDocument.</param>
+    /// <param name="OutStr">Parameter of type OutStream.</param>
+    procedure ReadXml(var Xml: XmlDocument; var TempCurrencyExchangeRate: Record "Currency Exchange Rate")
+    var
+
+        Currency: XmlNode;
+        Node: XmlNode;
+        Row: XmlNode;
+        Currencies: XmlNodeList;
+        Rows: XmlNodeList;
+    begin
+        if not Xml.SelectNodes('//*[local-name()="series"]', Currencies) then exit;
+        foreach Currency in Currencies do begin
+            TempCurrencyExchangeRate.Init();
+            Currency.SelectSingleNode('./*[local-name()="seriesid"]', Node);
+            TempCurrencyExchangeRate."Currency Code" := CopyStr(Node.AsXmlElement().InnerText, 4, 3);
+            Currency.SelectSingleNode('./*[local-name()="unit"]', Node);
+            TempCurrencyExchangeRate."Exchange Rate Amount" := EvaluateEValue(Node.AsXmlElement().InnerText);
+            Currency.SelectNodes('./*[local-name()="resultrows"]', Rows);
+            foreach Row in Rows do begin
+                Row.SelectSingleNode('./*[local-name()="date"]', Node);
+                Evaluate(TempCurrencyExchangeRate."Starting Date", Node.AsXmlElement().InnerText, 9);
+                Row.SelectSingleNode('./*[local-name()="value"]', Node);
+                TempCurrencyExchangeRate."Relational Exch. Rate Amount" := EvaluateEValue(Node.AsXmlElement().InnerText);
+                CurrHelper.OnBeforeAddCurrencyExchangeRate(UrlTok, TempCurrencyExchangeRate);
+                TempCurrencyExchangeRate.Insert();
+                CurrHelper.OnAfterAddingXmlCurrencyExchangeRate(UrlTok, Xml, Currency, TempCurrencyExchangeRate);
+            end;
+        end;
+        CurrHelper.OnAfterReadXml(UrlTok, Xml, TempCurrencyExchangeRate);
+    end;
+
+    /// <summary>
+    /// Register this Connected Exchange Rate Service method into the Connected Exchange Rate Service method list.
+    /// </summary>
+    procedure RegisterService(var CurrencyExchangeRateService: Record "O4N Curr. Exch. Rate Service")
+    begin
+        if CurrencyExchangeRateService.Get(UrlTok) then exit;
+        CurrencyExchangeRateService.Init();
+        CurrencyExchangeRateService.Url := UrlTok;
+        CurrencyExchangeRateService.Description := DescTok;
+        CurrencyExchangeRateService."Service Provider" := ServiceProviderTok;
+        CurrencyExchangeRateService."Codeunit Id" := Codeunit::"O4N Riksbank.se Latest";
+        CurrencyExchangeRateService."Setup Page Id" := 0;
+        CurrencyExchangeRateService.Insert(true);
+    end;
+
+    /// <summary>
+    /// Description for CreateRequestXml.
+    /// </summary>
+    local procedure CreateRequestXml(GLSetup: Record "General Ledger Setup") Xml: Text;
+    var
+        RequestXml: XmlDocument;
+    begin
+        CreateRequestXml(GLSetup, RequestXml);
+        RequestXml.WriteTo(Xml);
+    end;
+
+    /// <summary>
     /// Description for DownloadXml.
     /// </summary>
     /// <param name="ResponseXml">Parameter of type XmlDocument.</param>
     /// <returns>Return variable "Boolean".</returns>
     local procedure DownloadXml(GLSetup: Record "General Ledger Setup"; var ResponseXml: XmlDocument): Boolean
     var
+        IsHandled: Boolean;
         Client: HttpClient;
+        Headers: HttpHeaders;
         Request: HttpRequestMessage;
         Response: HttpResponseMessage;
-        Headers: HttpHeaders;
         InStr: InStream;
-        IsHandled: Boolean;
     begin
         Request.SetRequestUri('https://swea.riksbank.se/sweaWS/services/SweaWebServiceHttpSoap12Endpoint');
         Request.Method('POST');
@@ -70,45 +151,32 @@ codeunit 73420 "O4N Riksbank.se Latest"
         exit(Response.IsSuccessStatusCode);
     end;
 
-    /// <summary> 
-    /// Description for CreateRequestXml.
+    /// <summary>
+    /// Description for EvaluateEValue.
     /// </summary>
-    local procedure CreateRequestXml(GLSetup: Record "General Ledger Setup") Xml: Text;
+    /// <param name="InnerText">Parameter of type Text.</param>
+    local procedure EvaluateEValue(InnerText: Text) Amount: Decimal
     var
-        RequestXml: XmlDocument;
+        Values: List of [Text];
     begin
-        CreateRequestXml(GLSetup, RequestXml);
-        RequestXml.WriteTo(Xml);
+        Values := InnerText.Split('E');
+        Amount := GetDecimalValue(Values, 1) * Power(10, GetDecimalValue(Values, 2));
     end;
 
-    /// <summary> 
-    /// Description for CreateRequestXml.
+    /// <summary>
+    /// Description for GetDecimalValue.
     /// </summary>
-    /// <param name="Xml">Parameter of type XmlDocument.</param>
-    procedure CreateRequestXml(GLSetup: Record "General Ledger Setup"; var Xml: XmlDocument)
+    /// <param name="Values">Parameter of type List of [Text].</param>
+    /// <param name="ColumnNo">Parameter of type Integer.</param>
+    local procedure GetDecimalValue(Values: List of [Text]; ColumnNo: Integer) Amount: Decimal
     var
-        Envelope: XmlNode;
-        Header: XmlNode;
-        Body: XmlNode;
-        getLatestInterestAndExchangeRates: XmlNode;
+        ColumnValue: Text;
     begin
-        Xml := XmlDocument.Create();
-        xml.SetDeclaration(XmlDeclaration.Create('1.0', 'utf-8', 'yes'));
-        Envelope := XmlElement.Create('Envelope', 'http://www.w3.org/2003/05/soap-envelope').AsXmlNode();
-        Envelope.AsXmlElement().Add(XmlAttribute.CreateNamespaceDeclaration('soap', 'http://www.w3.org/2003/05/soap-envelope'));
-        Envelope.AsXmlElement().Add(XmlAttribute.CreateNamespaceDeclaration('xsd', 'http://swea.riksbank.se/xsd'));
-        Header := XmlElement.Create('Header', 'http://www.w3.org/2003/05/soap-envelope').AsXmlNode();
-        Envelope.AsXmlElement().Add(Header);
-        Body := XmlElement.Create('Body', 'http://www.w3.org/2003/05/soap-envelope').AsXmlNode();
-        Envelope.AsXmlElement().Add(Body);
-        getLatestInterestAndExchangeRates := XmlElement.Create('getLatestInterestAndExchangeRates', 'http://swea.riksbank.se/xsd').AsXmlNode();
-        Body.AsXmlElement().Add(getLatestInterestAndExchangeRates);
-        getLatestInterestAndExchangeRates.AsXmlElement().Add(XmlElement.Create('languageid', '', 'en').AsXmlNode());
-        GetSeries(GLSetup, getLatestInterestAndExchangeRates);
-        xml.Add(Envelope);
+        Values.Get(ColumnNo, ColumnValue);
+        Evaluate(Amount, ColumnValue, 9);
     end;
 
-    /// <summary> 
+    /// <summary>
     /// Description for GetSeries.
     /// </summary>
     /// <param name="SeriesNode">Parameter of type XmlNode.</param>
@@ -133,66 +201,19 @@ codeunit 73420 "O4N Riksbank.se Latest"
             SeriesNode.AsXmlElement().Add(XmlElement.Create('seriesid', '', StrSubstNo(SeriesTok, 'SEK', GLSetup."LCY Code")).AsXmlNode());
     end;
 
-    /// <summary> 
-    /// Description for D365 ConnectXml.
+    /// <summary>
+    /// Description for ThrowIfError.
     /// </summary>
-    /// <param name="Xml">Parameter of type XmlDocument.</param>
-    /// <param name="OutStr">Parameter of type OutStream.</param>
-    procedure ReadXml(var Xml: XmlDocument; var TempCurrencyExchangeRate: Record "Currency Exchange Rate")
+    /// <param name="ResponseXml">Parameter of type XmlDocument.</param>
+    local procedure ThrowIfError(var ResponseXml: XmlDocument)
     var
-
-        Currencies: XmlNodeList;
-        Currency: XmlNode;
-        Node: XmlNode;
-        Rows: XmlNodeList;
-        Row: XmlNode;
+        SelectTok: Label '//*[local-name()="%1"]', Locked = true;
+        SelectedNode: XmlNode;
     begin
-        if not Xml.SelectNodes('//*[local-name()="series"]', Currencies) then exit;
-        foreach Currency in Currencies do begin
-            TempCurrencyExchangeRate.Init();
-            Currency.SelectSingleNode('./*[local-name()="seriesid"]', Node);
-            TempCurrencyExchangeRate."Currency Code" := CopyStr(Node.AsXmlElement().InnerText, 4, 3);
-            Currency.SelectSingleNode('./*[local-name()="unit"]', Node);
-            TempCurrencyExchangeRate."Exchange Rate Amount" := EvaluateEValue(Node.AsXmlElement().InnerText);
-            Currency.SelectNodes('./*[local-name()="resultrows"]', Rows);
-            foreach Row in Rows do begin
-                Row.SelectSingleNode('./*[local-name()="date"]', Node);
-                Evaluate(TempCurrencyExchangeRate."Starting Date", Node.AsXmlElement().InnerText, 9);
-                Row.SelectSingleNode('./*[local-name()="value"]', Node);
-                TempCurrencyExchangeRate."Relational Exch. Rate Amount" := EvaluateEValue(Node.AsXmlElement().InnerText);
-                CurrHelper.OnBeforeAddCurrencyExchangeRate(UrlTok, TempCurrencyExchangeRate);
-                TempCurrencyExchangeRate.Insert();
-                CurrHelper.OnAfterAddingXmlCurrencyExchangeRate(UrlTok, Xml, Currency, TempCurrencyExchangeRate);
-            end;
-        end;
-        CurrHelper.OnAfterReadXml(UrlTok, Xml, TempCurrencyExchangeRate);
+        if not ResponseXml.SelectSingleNode(StrSubstNo(SelectTok, 'Fault'), SelectedNode) then exit;
+        if not ResponseXml.SelectSingleNode(StrSubstNo(SelectTok, 'Text'), SelectedNode) then exit;
+        Error(SelectedNode.AsXmlElement().InnerText);
     end;
-
-    /// <summary> 
-    /// Description for EvaluateEValue.
-    /// </summary>
-    /// <param name="InnerText">Parameter of type Text.</param>
-    local procedure EvaluateEValue(InnerText: Text) Amount: Decimal
-    var
-        Values: List of [Text];
-    begin
-        Values := InnerText.Split('E');
-        Amount := GetDecimalValue(Values, 1) * Power(10, GetDecimalValue(Values, 2));
-    end;
-
-    /// <summary> 
-    /// Description for GetDecimalValue.
-    /// </summary>
-    /// <param name="Values">Parameter of type List of [Text].</param>
-    /// <param name="ColumnNo">Parameter of type Integer.</param>
-    local procedure GetDecimalValue(Values: List of [Text]; ColumnNo: Integer) Amount: Decimal
-    var
-        ColumnValue: Text;
-    begin
-        Values.Get(ColumnNo, ColumnValue);
-        Evaluate(Amount, ColumnValue, 9);
-    end;
-
 
     [EventSubscriber(ObjectType::Table, Database::"O4N Curr. Exch. Rate Service", 'DiscoverCurrencyMappingCodeunits', '', false, false)]
     local procedure DiscoverCurrencyMappingCodeunits()
@@ -201,26 +222,4 @@ codeunit 73420 "O4N Riksbank.se Latest"
     begin
         RegisterService(CurrencyExchangeRateService);
     end;
-
-    /// <summary> 
-    /// Register this Connected Exchange Rate Service method into the Connected Exchange Rate Service method list.
-    /// </summary>
-    procedure RegisterService(var CurrencyExchangeRateService: Record "O4N Curr. Exch. Rate Service")
-    begin
-        if CurrencyExchangeRateService.Get(UrlTok) then exit;
-        CurrencyExchangeRateService.Init();
-        CurrencyExchangeRateService.Url := UrlTok;
-        CurrencyExchangeRateService.Description := DescTok;
-        CurrencyExchangeRateService."Service Provider" := ServiceProviderTok;
-        CurrencyExchangeRateService."Codeunit Id" := Codeunit::"O4N Riksbank.se Latest";
-        CurrencyExchangeRateService."Setup Page Id" := 0;
-        CurrencyExchangeRateService.Insert(true);
-    end;
-
-    var
-        HttpHelper: Codeunit "O4N Curr. Exch. Rate Http";
-        CurrHelper: Codeunit "O4N Curr. Exch. Rates Helper";
-        UrlTok: label 'https://D365Connect.com/SEK/riksbank.se/latest', Locked = true, MaxLength = 250;
-        DescTok: Label 'Downloads the latest exchange rates', Comment = '%1 = Web Service Url', MaxLength = 100;
-        ServiceProviderTok: Label 'https://www.riksbank.se/en-gb/statistics/search-interest--exchange-rates/web-services/series-for-web-services/', MaxLength = 250, Locked = true;
 }

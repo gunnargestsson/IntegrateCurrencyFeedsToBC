@@ -5,7 +5,7 @@ codeunit 93552 "O4N Currency Conversion Test"
 
     var
         Assert: Codeunit "Library Assert";
-    Any: Codeunit Any;
+        Any: Codeunit Any;
 
     [Test]
     procedure "ServiceInLCY_ConversionCalled_VerifySameExchangeRates"()
@@ -17,11 +17,11 @@ codeunit 93552 "O4N Currency Conversion Test"
     begin
         // [GIVEN] Service In LCY
         GLSetup.Get();
-        GLSetup."LCY Code" := Any.AlphabeticText(MaxStrLen(TempCurrencyExchangeRates."Currency Code"));
+        GLSetup."LCY Code" := CopyStr(Any.AlphabeticText(MaxStrLen(TempCurrencyExchangeRates."Currency Code")), 1, MaxStrLen(GLSetup."LCY Code"));
         GLSetup.Modify();
 
         // [GIVEN] Random Exchange Rate
-        CreateAnyCurrencyExchangeRate(Any.AlphabeticText(MaxStrLen(TempCurrencyExchangeRates."Currency Code")), Any.DateInRange(Today() - 50, 25), TempCurrencyExchangeRates);
+        CreateAnyCurrencyExchangeRate(CopyStr(Any.AlphabeticText(MaxStrLen(TempCurrencyExchangeRates."Currency Code")), 1, 10), Any.DateInRange(Today() - 50, 25), TempCurrencyExchangeRates);
         CreatedCurrencyExchangeRates := TempCurrencyExchangeRates;
 
         // [WHEN] Conversion Called        
@@ -45,7 +45,7 @@ codeunit 93552 "O4N Currency Conversion Test"
     begin
         // [GIVEN] Service In LCY
         GLSetup.Get();
-        GLSetup."LCY Code" := Any.AlphabeticText(MaxStrLen(TempCurrencyExchangeRates."Currency Code"));
+        GLSetup."LCY Code" := CopyStr(Any.AlphabeticText(MaxStrLen(TempCurrencyExchangeRates."Currency Code")), 1, MaxStrLen(GLSetup."LCY Code"));
         GLSetup.Modify();
 
         // [GIVEN] Random Exchange Rate
@@ -53,7 +53,7 @@ codeunit 93552 "O4N Currency Conversion Test"
         CreatedCurrencyExchangeRates := TempCurrencyExchangeRates;
 
         // [GIVEN] Service in Any Currency
-        ServiceCurrencyCode := Any.AlphabeticText(MaxStrLen(TempCurrencyExchangeRates."Currency Code"));
+        ServiceCurrencyCode := CopyStr(Any.AlphabeticText(MaxStrLen(TempCurrencyExchangeRates."Currency Code")), 1, MaxStrLen(ServiceCurrencyCode));
 
         // [WHEN] Conversion Called
         CurrencyConversion.ConvertToLCYRate(ServiceCurrencyCode, GLSetup."LCY Code", TempCurrencyExchangeRates);
@@ -78,7 +78,7 @@ codeunit 93552 "O4N Currency Conversion Test"
     begin
         // [GIVEN] Service In LCY
         GLSetup.Get();
-        GLSetup."LCY Code" := Any.AlphabeticText(MaxStrLen(TempCurrencyExchangeRates."Currency Code"));
+        GLSetup."LCY Code" := CopyStr(Any.AlphabeticText(MaxStrLen(TempCurrencyExchangeRates."Currency Code")), 1, MaxStrLen(GLSetup."LCY Code"));
         GLSetup.Modify();
 
         // [GIVEN] Random Exchange Rate
@@ -86,11 +86,11 @@ codeunit 93552 "O4N Currency Conversion Test"
         CreatedCurrencyExchangeRates := TempCurrencyExchangeRates;
 
         // [GIVEN] Another random exchange rate
-        CreateAnyCurrencyExchangeRate(Any.AlphabeticText(MaxStrLen(TempCurrencyExchangeRates."Currency Code")), CreatedCurrencyExchangeRates."Starting Date", TempCurrencyExchangeRates);
+        CreateAnyCurrencyExchangeRate(CopyStr(Any.AlphabeticText(MaxStrLen(TempCurrencyExchangeRates."Currency Code")), 1, 10), CreatedCurrencyExchangeRates."Starting Date", TempCurrencyExchangeRates);
         SecondCreatedCurrencyExchangeRates := TempCurrencyExchangeRates;
 
         // [GIVEN] Service in Any Currency
-        ServiceCurrencyCode := Any.AlphabeticText(MaxStrLen(TempCurrencyExchangeRates."Currency Code"));
+        ServiceCurrencyCode := CopyStr(Any.AlphabeticText(MaxStrLen(TempCurrencyExchangeRates."Currency Code")), 1, MaxStrLen(ServiceCurrencyCode));
 
         // [WHEN] Conversion Called
         CurrencyConversion.ConvertToLCYRate(ServiceCurrencyCode, GLSetup."LCY Code", TempCurrencyExchangeRates);
