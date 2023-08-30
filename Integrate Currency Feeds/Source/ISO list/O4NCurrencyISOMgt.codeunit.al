@@ -90,7 +90,7 @@ codeunit 73407 "O4N Currency ISO Mgt"
         InStr: Instream;
     begin
         TempBlob.CreateInStream(InStr);
-        Client.Get('https://www.currency-iso.org/dam/downloads/lists/list_one.xml', Response);
+        Client.Get('https://www.six-group.com/dam/download/financial-information/data-center/iso-currrency/lists/list-one.xml', Response);
         Response.Content.ReadAs(InStr);
         XmlDocument.ReadFrom(InStr, Doc);
     end;
