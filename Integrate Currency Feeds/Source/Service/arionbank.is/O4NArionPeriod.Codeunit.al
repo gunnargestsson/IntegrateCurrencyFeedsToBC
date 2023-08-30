@@ -42,7 +42,7 @@ codeunit 73412 "O4N Arion Period"
         InStr: InStream;
         IsHandled: Boolean;
     begin
-        Request.SetRequestUri(StrSubstNo(RequestUrlTok, Format(StartDate, 0, 9), Format(CreateDateTime(EndDate, 235959T), 0, 9)));
+        Request.SetRequestUri(StrSubstNo(RequestUrlTok, Format(StartDate, 0, 9), Format(EndDate, 0, 9)));
         Request.Method('GET');
         CurrHelper.OnBeforeClientSend(UrlTok, Request, Response, IsHandled);
         if not IsHandled then
