@@ -1,7 +1,7 @@
 codeunit 73412 "O4N Arion Period"
 {
     TableNo = "O4N Currency Buffer";
-    // http://www.arionbanki.is/markadir/gjaldmidlar/gengi/xml-export/?beginDate=%1&finalDate=%2&currencytype=AlmenntGengi
+    // https://www.arionbanki.is/markadir/gjaldmidlar/gengi/xml-export/?beginDate=%1&finalDate=%2&currencytype=AlmenntGengi
 
     trigger OnRun()
     var
@@ -10,8 +10,7 @@ codeunit 73412 "O4N Arion Period"
         CurrencyConvertion: Codeunit "O4N Currency Conversion";
         DateMgt: Codeunit "O4N Currency Date Mgt.";
         CurrencyFilter: Codeunit "O4N Currency Filter Mgt.";
-        EndDate: Date;
-        StartDate: Date;
+        CurrenyDate, StartDate, EndDate : Date;
         OutStr: OutStream;
         Xml: XmlDocument;
     begin
@@ -20,8 +19,11 @@ codeunit 73412 "O4N Arion Period"
 
         DateMgt.GetCurrencyPeriod(UrlTok, Rec."Get Structure", 'ISL', StartDate, EndDate);
 
-        DownloadXml(StartDate, EndDate, Xml);
-        ReadXml(Xml, TempCurrencyExchangeRate);
+
+        for CurrenyDate := StartDate to EndDate do begin
+            DownloadXml(CurrenyDate, Xml);
+            ReadXml(Xml, TempCurrencyExchangeRate);
+        end;
 
         if GLSetup."LCY Code" <> 'ISK' then
             CurrencyConvertion.ConvertToLCYRate('ISK', GLSetup."LCY Code", TempCurrencyExchangeRate);
@@ -41,6 +43,7 @@ codeunit 73412 "O4N Arion Period"
 
     procedure ReadXml(var Xml: XmlDocument; var TempCurrencyExchangeRate: Record "Currency Exchange Rate")
     var
+        TempExistingCurrencyExchangeRate: Record "Currency Exchange Rate" temporary;
         Setup: Record "O4N Arion Banki Setup";
         TypeHelper: Codeunit "Type Helper";
         PurchaseRate, SalesRate : Decimal;
@@ -49,6 +52,7 @@ codeunit 73412 "O4N Arion Period"
         Node: XmlNode;
         Currencies: XmlNodeList;
     begin
+        TempExistingCurrencyExchangeRate.Copy(TempCurrencyExchangeRate, true);
         if not Xml.SelectNodes('//*[local-name()="Currency"]', Currencies) then exit;
         if not Setup.Get() then
             Setup.Init();
@@ -75,7 +79,8 @@ codeunit 73412 "O4N Arion Period"
                     TempCurrencyExchangeRate."Relational Exch. Rate Amount" := Round((PurchaseRate + SalesRate) / 2, 0.0001, '=');
             end;
             CurrHelper.OnBeforeAddCurrencyExchangeRate(UrlTok, TempCurrencyExchangeRate);
-            TempCurrencyExchangeRate.Insert();
+            if not TempExistingCurrencyExchangeRate.Get(TempCurrencyExchangeRate."Currency Code", TempCurrencyExchangeRate."Starting Date") then
+                TempCurrencyExchangeRate.Insert();
             CurrHelper.OnAfterAddingXmlCurrencyExchangeRate(UrlTok, Xml, Currency, TempCurrencyExchangeRate);
         end;
         CurrHelper.OnAfterReadXml(UrlTok, Xml, TempCurrencyExchangeRate);
@@ -96,7 +101,7 @@ codeunit 73412 "O4N Arion Period"
         CurrencyExchangeRateService.Insert(true);
     end;
 
-    local procedure DownloadXml(StartDate: Date; EndDate: Date; var ResponseXml: XmlDocument)
+    local procedure DownloadXml(StartDate: Date; var ResponseXml: XmlDocument)
     var
         IsHandled: Boolean;
         Client: HttpClient;
@@ -104,9 +109,9 @@ codeunit 73412 "O4N Arion Period"
         Response: HttpResponseMessage;
         InStr: InStream;
         RequestErr: Label 'Error Code: %1\%2', Comment = '%1 = Response Error Code, %2 = Response Error Phrase';
-        RequestUrlTok: Label 'http://www.arionbanki.is/markadir/gjaldmidlar/gengi/xml-export/?beginDate=%1&finalDate=%2&currencytype=AlmenntGengi', Locked = true;
+        RequestUrlTok: Label 'https://www.arionbanki.is/markadir/gjaldmidlar/gengi/xml-export/?beginDate=%1&currencytype=AlmenntGengi', Locked = true;
     begin
-        Request.SetRequestUri(StrSubstNo(RequestUrlTok, Format(StartDate, 0, 9), Format(EndDate, 0, 9)));
+        Request.SetRequestUri(StrSubstNo(RequestUrlTok, Format(StartDate, 0, 9)));
         Request.Method('GET');
         CurrHelper.OnBeforeClientSend(UrlTok, Request, Response, IsHandled);
         if not IsHandled then

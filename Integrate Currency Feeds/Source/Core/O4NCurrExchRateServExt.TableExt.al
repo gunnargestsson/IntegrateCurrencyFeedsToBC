@@ -4,7 +4,7 @@ tableextension 73400 "O4N Curr. Exch. Rate Serv. Ext" extends "Curr. Exch. Rate 
     {
         field(73400; "O4N Currency Filter"; Blob)
         {
-            Caption = 'O4N Currency Filter';
+            Caption = 'Currency Filter';
             DataClassification = SystemMetadata;
         }
     }

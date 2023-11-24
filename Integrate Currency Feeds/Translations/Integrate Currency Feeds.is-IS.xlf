@@ -21,6 +21,12 @@
           <note from="Developer" annotates="general" priority="2"></note>
           <note from="Xliff Generator" annotates="general" priority="3">Table O4N Arion Banki Setup - Field Rate Type - Property Caption</note>
         </trans-unit>
+        <trans-unit id="Table 96542906 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Connect Exch. Rate Setup</source>
+          <target state="translated">Tengiuppsetning gengis</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table O4N Connect Exch. Rate Setup - Property Caption</note>
+        </trans-unit>
         <trans-unit id="Table 96542906 - Field 1255430798 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
           <source>Cache Service Url</source>
           <target state="translated">Vefslóð biðminnisþjónustu</target>
@@ -93,6 +99,12 @@
           <note from="Developer" annotates="general" priority="2"></note>
           <note from="Xliff Generator" annotates="general" priority="3">Table O4N Curr. Exch. Rate Service - Field Url - Property Caption</note>
         </trans-unit>
+        <trans-unit id="Table 2667293814 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Currency Buffer</source>
+          <target state="translated">Biðskrá gjaldmiðils</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table O4N Currency Buffer - Property Caption</note>
+        </trans-unit>
         <trans-unit id="Table 2667293814 - NamedType 1095609322" size-unit="char" translate="yes" xml:space="preserve">
           <source>Specify currency filter for when the exchange rates will be applied.</source>
           <target state="translated">Tilgreina gjaldmiðilsafmörkun fyrir þegar gengið verður notað.</target>
@@ -121,9 +133,15 @@
         </trans-unit>
         <trans-unit id="Table 2667293814 - Field 750064457 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
           <source>Temp Blob</source>
-          <target state="translated">BLOB tímab</target>
+          <target state="translated">BLOB tímabundið</target>
           <note from="Developer" annotates="general" priority="2"></note>
           <note from="Xliff Generator" annotates="general" priority="3">Table O4N Currency Buffer - Field Temp Blob - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 3417040914 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Sedlabanki.is Setup</source>
+          <target state="translated">Uppsetning Sedlabanki.is</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table O4N Sedlabanki.is Setup - Property Caption</note>
         </trans-unit>
         <trans-unit id="Table 3417040914 - Field 1663593181 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
           <source>Primary Key</source>
@@ -136,6 +154,12 @@
           <target state="translated">Tegund gengis</target>
           <note from="Developer" annotates="general" priority="2"></note>
           <note from="Xliff Generator" annotates="general" priority="3">Table O4N Sedlabanki.is Setup - Field Rate Type - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2435344630 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Setup fixer.io</source>
+          <target state="translated">Uppsetning fixer.io</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table O4N Setup fixer.io - Property Caption</note>
         </trans-unit>
         <trans-unit id="Table 2435344630 - NamedType 3294769958" size-unit="char" translate="yes" xml:space="preserve">
           <source>Account API Key is missing in %1</source>
@@ -160,6 +184,12 @@
           <target state="translated">Gerð áskriftar</target>
           <note from="Developer" annotates="general" priority="2"></note>
           <note from="Xliff Generator" annotates="general" priority="3">Table O4N Setup fixer.io - Field Subscription Type - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 694487868 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Setup xe.com</source>
+          <target state="translated">Uppsetning xe.com</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table O4N Setup xe.com - Property Caption</note>
         </trans-unit>
         <trans-unit id="Table 694487868 - NamedType 3294769958" size-unit="char" translate="yes" xml:space="preserve">
           <source>Account ID and Account API Key is missing in %1</source>
@@ -226,6 +256,12 @@
           <target state="translated">Upphafstími áskriftar</target>
           <note from="Developer" annotates="general" priority="2"></note>
           <note from="Xliff Generator" annotates="general" priority="3">Table O4N Setup xe.com - Field Subscription Start Time - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 896418414 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>tcmb.gov.tr Setup</source>
+          <target state="translated">Uppsetning tcmb.gov.tr</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table O4N tcmb.gov.tr Setup - Property Caption</note>
         </trans-unit>
         <trans-unit id="Table 896418414 - Field 1663593181 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
           <source>Primary Key</source>
@@ -698,7 +734,7 @@
         </trans-unit>
         <trans-unit id="Page 2435344630 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
           <source>Setup fixer.io</source>
-          <target state="translated">Setja upp fixer.io</target>
+          <target state="translated">Uppsetning fixer.io</target>
           <note from="Developer" annotates="general" priority="2"></note>
           <note from="Xliff Generator" annotates="general" priority="3">Page O4N Setup fixer.io - Property Caption</note>
         </trans-unit>
@@ -914,8 +950,8 @@
           <note from="Xliff Generator" annotates="general" priority="3">PageExtension O4NCurrExchRateServ - Control O4NCurrencyFilterField - Property Caption</note>
         </trans-unit>
         <trans-unit id="TableExtension 1443021102 - Field 2865176230 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve" al-object-target="Table 902159576">
-          <source>O4N Currency Filter</source>
-          <target state="translated">O4N-gjaldmiðilsafmörkun</target>
+          <source>Currency Filter</source>
+          <target state="translated">gjaldmiðilsafmörkun</target>
           <note from="Developer" annotates="general" priority="2"></note>
           <note from="Xliff Generator" annotates="general" priority="3">TableExtension O4N Curr. Exch. Rate Serv. Ext - Field O4N Currency Filter - Property Caption</note>
         </trans-unit>

@@ -1,6 +1,6 @@
 table 73401 "O4N Currency Buffer"
 {
-    Caption = 'O4N Currency Buffer';
+    Caption = 'Currency Buffer';
     DataClassification = SystemMetadata;
     TableType = Temporary;
     fields

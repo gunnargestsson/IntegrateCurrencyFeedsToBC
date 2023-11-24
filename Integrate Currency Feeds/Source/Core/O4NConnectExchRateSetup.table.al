@@ -1,6 +1,6 @@
 table 73402 "O4N Connect Exch. Rate Setup"
 {
-    Caption = 'O4N Connect Exch. Rate Setup';
+    Caption = 'Connect Exch. Rate Setup';
     DataClassification = SystemMetadata;
     fields
     {

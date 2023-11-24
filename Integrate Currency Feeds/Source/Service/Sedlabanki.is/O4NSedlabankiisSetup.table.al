@@ -1,6 +1,6 @@
 table 73421 "O4N Sedlabanki.is Setup"
 {
-    Caption = 'O4N Sedlabanki.is Setup';
+    Caption = 'Sedlabanki.is Setup';
     DataClassification = SystemMetadata;
     fields
     {

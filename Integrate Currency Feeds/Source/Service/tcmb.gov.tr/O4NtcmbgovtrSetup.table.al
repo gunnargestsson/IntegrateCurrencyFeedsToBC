@@ -1,6 +1,6 @@
 table 73428 "O4N tcmb.gov.tr Setup"
 {
-    Caption = 'O4N tcmb.gov.tr Setup';
+    Caption = 'tcmb.gov.tr Setup';
     DataClassification = SystemMetadata;
     fields
     {

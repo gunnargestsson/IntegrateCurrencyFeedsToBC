@@ -1,6 +1,6 @@
 table 73425 "O4N Setup fixer.io"
 {
-    Caption = 'O4N Setup fixer.io';
+    Caption = 'Setup fixer.io';
     DataClassification = SystemMetadata;
     fields
     {

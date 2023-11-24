@@ -1,6 +1,6 @@
 table 73424 "O4N Setup xe.com"
 {
-    Caption = 'O4N Setup xe.com';
+    Caption = 'Setup xe.com';
     DataClassification = SystemMetadata;
     fields
     {

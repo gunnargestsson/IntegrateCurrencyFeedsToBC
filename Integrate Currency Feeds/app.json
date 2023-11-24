@@ -35,5 +35,6 @@
   ],
   "suppressWarnings": [
     "AA0072"
-  ]
+  ],
+  "runtime": "11.0"
 }
