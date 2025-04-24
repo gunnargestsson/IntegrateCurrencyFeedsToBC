@@ -1,6 +1,0 @@
-################# Latest
-GET https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml
-
-
-################# Last 90 days
-GET https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist-90d.xml

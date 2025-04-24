@@ -1,2 +1,0 @@
-########## Get Currency ISO List
-GET https://www.currency-iso.org/dam/downloads/lists/list_one.xml 
